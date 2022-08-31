@@ -11,8 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AccountManagement.Data;
+using AccountManagement.Contracts;
 using Microsoft.EntityFrameworkCore;
+using AccountManagement.Data;
+using AccountManagement.Repository;
 
 namespace AccountManagement
 {
@@ -26,19 +28,21 @@ namespace AccountManagement
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) 
+        public void ConfigureServices(IServiceCollection services)
         {
-            
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AccountManagement", Version = "v1" });
             });
 
-           services.AddDbContext<RepositoryDbContext>(options=> 
-               options.UseSqlServer(
-                   Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddSingleton<DapperDbContext>();
+            services.AddScoped<IClientRepository, ClientRepository>();
 
         }
 
@@ -62,6 +66,7 @@ namespace AccountManagement
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
