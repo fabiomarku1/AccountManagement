@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AccountManagement.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AccountManagement.Contracts
 {
@@ -11,5 +12,8 @@ namespace AccountManagement.Contracts
         public Task<Client> GetClientId(int id);
 
         public Task<Client> Create(Client entity);
+
+
+        public  Task<ActionResult<List<Client>>> CreateNewClient(Client entity);
     }
 }

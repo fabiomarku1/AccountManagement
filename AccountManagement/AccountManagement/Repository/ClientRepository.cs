@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AccountManagement.Repository
 {
@@ -19,35 +21,28 @@ namespace AccountManagement.Repository
         }
         public async Task<Client> GetClientId(int id)
         {
-            var query = "select * from Client where Id=@id ";
-
-            using (var connect = _dataBase.CreateConnection())
-            {
-                var client = await connect.QueryFirstOrDefaultAsync<Client>(query);
-                return client;
-            }
-            {
-
-            }
+            using var connect = _dataBase.CreateConnection();
+            var client = await connect.QueryFirstOrDefaultAsync<Client>($"select * from Client where Id={id} ");
+            return client;
+                
         }
 
         public async Task<IEnumerable<Client>> GetClients()
         {
-            var query = "SELECT * FROM Client";
-            using (var connection = _dataBase.CreateConnection())
-            {
-                var clients = await connection.QueryAsync<Client>(query);
-                return clients.ToList();
-            }
+            using var connection = _dataBase.CreateConnection();
+            var clients = await connection.QueryAsync<Client>("SELECT * FROM Client");
+            return clients.ToList();
 
         }
-        public async Task<Client> Create(Client entity)
+
+            public async Task<Client> Create(Client entity)
         {
             var query =
-                "insert into Client (Id,FirstName,Last,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@Id,@FirstName,@Last,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)" +
-                "select cast(scope_identity() as int";
+                "insert into Client (Id,FirstName,Last,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@Id,@FirstName,@Last,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
+                //   "select cast(scope_identity() as int";
 
             var parameters = new DynamicParameters();
+            byte[] arrBytes = new byte[10];
 
             parameters.Add("Id", entity.Id, DbType.Int32);
             parameters.Add("FirstName", entity.FirstName, DbType.AnsiString);
@@ -58,8 +53,8 @@ namespace AccountManagement.Repository
             parameters.Add("DateCreated", entity.DateCreated, DbType.DateTime);
             parameters.Add("DateModified", entity.DateModified, DbType.DateTime);
             parameters.Add("Username", entity.Username, DbType.AnsiString);
-            parameters.Add("PasswordHash", entity.PasswordHash, DbType.Byte);
-            parameters.Add("PasswordSalt", entity.PasswordSalt, DbType.Byte);
+           // parameters.Add("PasswordHash", entity.PasswordHash,arr);
+         //   parameters.Add("PasswordSalt", entity.PasswordSalt, DbType.Int16);
 
             using (var connect = _dataBase.CreateConnection())
             {
@@ -76,8 +71,8 @@ namespace AccountManagement.Repository
                     DateCreated = entity.DateCreated,
                     DateModified = entity.DateModified,
                     Username = entity.Username,
-                    PasswordHash = entity.PasswordHash,
-                    PasswordSalt = entity.PasswordSalt
+                    PasswordHash = arrBytes,
+                    PasswordSalt = arrBytes
                 };
                 return createClient;
             }
@@ -86,6 +81,18 @@ namespace AccountManagement.Repository
 
 
         }
+
+
+
+            public async Task<ActionResult<List<Client>>> CreateNewClient(Client entity)
+            {
+                using var connect = _dataBase.CreateConnection();
+
+            var client =await connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
+
+            return null;
+            }
+
 
 
 
