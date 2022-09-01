@@ -11,9 +11,10 @@ namespace AccountManagement.Contracts
         public Task<IEnumerable<Client>> GetClients();
         public Task<Client> GetClientId(int id);
 
-        public Task<Client> Create(Client entity);
+        //  public bool Create(Client entity);
 
 
-        public  Task<ActionResult<List<Client>>> CreateNewClient(Client entity);
+        public bool CreateNewClient(Client entity);
+        public bool Update(Client entity);
     }
 }

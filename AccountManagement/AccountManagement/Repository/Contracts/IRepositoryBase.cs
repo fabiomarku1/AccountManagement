@@ -6,6 +6,8 @@ namespace AccountManagement.Contracts
 {
     public interface IRepositoryBase<T> where T : class
     {
+
+        bool Create(T entity);
         /*
         ICollection<T> FindAll(); // may be removed
         T FindById(int id);
@@ -16,7 +18,7 @@ namespace AccountManagement.Contracts
         bool Save();
 
         
-        Task Create(T entity);
+        
         */
     }
 }

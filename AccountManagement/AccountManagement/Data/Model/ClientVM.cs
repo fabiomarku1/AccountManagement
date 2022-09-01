@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using System;
 
-namespace AccountManagement.Data
+namespace AccountManagement.Data.Model
 {
-    public class Client
+    public class ClientVM
     {
         [Key] public int Id { get; set; }
         public string FirstName { get; set; }

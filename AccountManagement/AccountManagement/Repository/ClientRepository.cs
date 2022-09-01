@@ -8,6 +8,7 @@ using System.Windows.Markup;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using AccountManagement.Data.Model;
 
 namespace AccountManagement.Repository
 {
@@ -24,7 +25,7 @@ namespace AccountManagement.Repository
             using var connect = _dataBase.CreateConnection();
             var client = await connect.QueryFirstOrDefaultAsync<Client>($"select * from Client where Id={id} ");
             return client;
-                
+
         }
 
         public async Task<IEnumerable<Client>> GetClients()
@@ -35,64 +36,73 @@ namespace AccountManagement.Repository
 
         }
 
-            public async Task<Client> Create(Client entity)
+        public bool Create(Client entity)
         {
-            var query =
-                "insert into Client (Id,FirstName,Last,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@Id,@FirstName,@Last,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
-                //   "select cast(scope_identity() as int";
+            var connect = _dataBase.CreateConnection();
+            string query =
+                "insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
 
-            var parameters = new DynamicParameters();
-            byte[] arrBytes = new byte[10];
-
-            parameters.Add("Id", entity.Id, DbType.Int32);
-            parameters.Add("FirstName", entity.FirstName, DbType.AnsiString);
-            parameters.Add("LastName", entity.LastName, DbType.AnsiString);
-            parameters.Add("Email", entity.Email, DbType.AnsiString);
-            parameters.Add("Birthday", entity.Birthday, DbType.DateTime);
-            parameters.Add("Phone", entity.Phone, DbType.AnsiString);
-            parameters.Add("DateCreated", entity.DateCreated, DbType.DateTime);
-            parameters.Add("DateModified", entity.DateModified, DbType.DateTime);
-            parameters.Add("Username", entity.Username, DbType.AnsiString);
-           // parameters.Add("PasswordHash", entity.PasswordHash,arr);
-         //   parameters.Add("PasswordSalt", entity.PasswordSalt, DbType.Int16);
-
-            using (var connect = _dataBase.CreateConnection())
+            var rowsAffected = connect.Execute(query, new
             {
-                var id = await connect.QuerySingleAsync<int>(query, parameters);
+                entity.Id,
+                entity.FirstName,
+                entity.LastName,
+                entity.Email,
+                entity.Birthday,
+                entity.Phone,
+                entity.DateCreated,
+                entity.DateModified,
+                entity.Username,
+                entity.PasswordHash,
+                entity.PasswordSalt,
 
-                var createClient = new Client
-                {
-                    Id = entity.Id,
-                    FirstName = entity.FirstName,
-                    LastName = entity.LastName,
-                    Email = entity.Email,
-                    Birthday = entity.Birthday,
-                    Phone = entity.Phone,
-                    DateCreated = entity.DateCreated,
-                    DateModified = entity.DateModified,
-                    Username = entity.Username,
-                    PasswordHash = arrBytes,
-                    PasswordSalt = arrBytes
-                };
-                return createClient;
-            }
+            });
+            // var client = connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
 
-
-
-
+            return rowsAffected > 0 ? true : false;
         }
 
 
 
-            public async Task<ActionResult<List<Client>>> CreateNewClient(Client entity)
+        public bool CreateNewClient(Client entity)
+        {
+            var connect = _dataBase.CreateConnection();
+            string query =
+                "insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
+
+            var rowsAffected = connect.Execute(query, new
             {
-                using var connect = _dataBase.CreateConnection();
+                entity.Id,
+                entity.FirstName,
+                entity.LastName,
+                entity.Email,
+                entity.Birthday,
+                entity.Phone,
+                entity.DateCreated,
+                entity.DateModified,
+                entity.Username,
+                entity.PasswordHash,
+                entity.PasswordSalt,
 
-            var client =await connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
+            });
+            // var client = connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
 
-            return null;
-            }
+            return rowsAffected > 0 ? true : false;
 
+        }
+
+        public bool Update(Client entity)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //public bool Update(Client entity)
+        //{
+        //    var connection = _dataBase.CreateConnection();
+
+
+        //}
 
 
 
@@ -131,11 +141,7 @@ namespace AccountManagement.Repository
                     return changes > 0;
                 }
 
-                public bool Update(Client entity)
-                {
-                    _dataBase.Clients.Update(entity);
-                    return Save();
-                }
+            
                 */
     }
 }

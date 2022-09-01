@@ -13,8 +13,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using Microsoft.EntityFrameworkCore;
-using AccountManagement.Data;
 using AccountManagement.Repository;
+using AccountManagement.Data.Model;
 
 namespace AccountManagement
 {
@@ -37,13 +37,14 @@ namespace AccountManagement
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AccountManagement", Version = "v1" });
             });
 
-            services.AddDbContext<DbContext>(options =>
+            services.AddDbContext<RepositoryContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddSingleton<DapperDbContext>();
+            //    services.AddSingleton<RepositoryContext>();
             services.AddScoped<IClientRepository, ClientRepository>();
-
+            //    services.AddControllers().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

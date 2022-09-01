@@ -17,5 +17,14 @@ namespace AccountManagement.Data
         public DateTime DateModified { get; set; }
 
         //public int Action {get; set; }
+
+        /*
+        public enum MyEnum
+        {
+            Depostim,
+            Terheqje ,
+
+        }
+        */
     }
 }

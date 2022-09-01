@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Data;
-using AccountManagement.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace AccountManagement.Data
+namespace AccountManagement.Data.Model
 {
     public class DapperDbContext
     {
@@ -21,18 +20,5 @@ namespace AccountManagement.Data
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
 
-        /*
-        public DapperDbContext(DbContextOptions<DapperDbContext> options)
-            : base(options)
-        {
-
-        }
-
-
-
-        public DbSet<Client> Clients { get; set; }
-        public DbSet<Currency> Currencies { get; set; }
-        public DbSet<BankAccount> BankAccounts { get; set; }
-        */
     }
 }
