@@ -8,7 +8,10 @@ using System.Windows.Markup;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Reflection.Metadata;
+using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AutoMapper;
 
 namespace AccountManagement.Repository
 {
@@ -16,9 +19,13 @@ namespace AccountManagement.Repository
     {
 
         private readonly DapperDbContext _dataBase;
-        public ClientRepository(DapperDbContext dataBase)
+        private readonly IMapper _mapper;
+
+
+        public ClientRepository(DapperDbContext dataBase, IMapper mapper)
         {
             _dataBase = dataBase;
+            _mapper = mapper;
         }
         public async Task<Client> GetClientId(int id)
         {
@@ -62,34 +69,48 @@ namespace AccountManagement.Repository
             return rowsAffected > 0 ? true : false;
         }
 
-
-
-        public bool CreateNewClient(Client entity)
+        public bool CreateNewDto(ClientDto entity)
         {
             var connect = _dataBase.CreateConnection();
-            string query =
-                "insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
+            //var client = new Client();
+
+            var client = _mapper.Map<Client>(entity);
+
+         var date=DateTime.Now;
+            string query = $"insert into Client(FirstName,LastName,Email,Birthday,Phone,Username,Password,DateCreated) values  (@FirstName,@LastName,@Email,@Birthday,@Phone,@Username,@Password,@DateCreated)";
+
+
 
             var rowsAffected = connect.Execute(query, new
             {
-                entity.Id,
-                entity.FirstName,
-                entity.LastName,
-                entity.Email,
-                entity.Birthday,
-                entity.Phone,
-                entity.DateCreated,
-                entity.DateModified,
-                entity.Username,
-                entity.PasswordHash,
-                entity.PasswordSalt,
+                client.FirstName,
+                client.LastName,
+                client.Email,
+               client.Birthday,
+               client.Phone,
+               client.Username,
+               client.Password,
+               client.DateCreated
+            });
+
+            /*
+          var rowsAffected = connect.Execute(query, new
+            {
+                FirstName=entity.FirstName,
+                LastName=entity.LastName,
+                Email=entity.Email,
+                Birthday=entity.Birthday,
+                Phone=entity.Phone,
+                Username=entity.Username,
+                Password=entity.Password
 
             });
-            // var client = connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
-
+          */
             return rowsAffected > 0 ? true : false;
-
         }
+
+
+
 
         public bool Update(Client entity)
         {

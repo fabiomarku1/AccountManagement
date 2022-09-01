@@ -15,6 +15,7 @@ using AccountManagement.Contracts;
 using Microsoft.EntityFrameworkCore;
 using AccountManagement.Repository;
 using AccountManagement.Data.Model;
+using AccountManagement.Mapping;
 
 namespace AccountManagement
 {
@@ -42,9 +43,10 @@ namespace AccountManagement
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddSingleton<DapperDbContext>();
-            //    services.AddSingleton<RepositoryContext>();
+
+
             services.AddScoped<IClientRepository, ClientRepository>();
-            //    services.AddControllers().AddNewtonsoftJson();
+            services.AddAutoMapper(typeof(Mapper));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

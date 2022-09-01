@@ -9,11 +9,12 @@ namespace AccountManagement.Data
         [Key] public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
         public string Email { get; set; } //unique
         public DateTime Birthday { get; set; }
         public string Phone { get; set; } //unique
         public DateTime DateCreated { get; set; } = DateTime.Now;
-        public DateTime DateModified { get; set; }
+        public DateTime DateModified { get; set; } 
 
 
         public string Username { get; set; } //unique

@@ -3,6 +3,7 @@ using System.Data;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
+using AccountManagement.Data.DTO;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,14 @@ namespace AccountManagement.Controllers
         public IActionResult Create(Client entity)
         {
             var client = _clientRepository.Create(entity);
+            return Ok(new { Result = true });
+        }
+
+
+        [HttpPost(nameof(ClientDto))]
+        public IActionResult CreateNewDto(ClientDto entity)
+        {
+            var client = _clientRepository.CreateNewDto(entity);
             return Ok(new { Result = true });
         }
 

@@ -9,6 +9,6 @@ namespace AccountManagement.Data
         public string Code { get; set; }
         public string Description { get; set; }
         public DateTime DateCreated { get; set; }=DateTime.Now;
-        public DateTime DateModified { get; set; }
+        public DateTime? DateModified { get; set; } = null;
     }
 }

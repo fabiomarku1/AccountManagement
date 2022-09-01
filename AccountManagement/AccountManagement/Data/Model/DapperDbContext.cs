@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Data;
+using Microsoft.AspNetCore.Connections;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,11 +15,10 @@ namespace AccountManagement.Data.Model
         public DapperDbContext(IConfiguration configuration)
         {
             _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("SqlConnection");
+            _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
         public IDbConnection CreateConnection() => new SqlConnection(_connectionString);
-
 
     }
 }
