@@ -20,17 +20,22 @@ namespace AccountManagement.Repository
 
         private readonly DapperDbContext _dataBase;
         private readonly IMapper _mapper;
+        private readonly RepositoryContext _repositoryContext;
 
 
-        public ClientRepository(DapperDbContext dataBase, IMapper mapper)
+        public ClientRepository(DapperDbContext dataBase, IMapper mapper, RepositoryContext repositoryContext)
         {
             _dataBase = dataBase;
             _mapper = mapper;
+            _repositoryContext = repositoryContext;
         }
+
+
+
         public async Task<Client> GetClientId(int id)
         {
             using var connect = _dataBase.CreateConnection();
-            var client = await connect.QueryFirstOrDefaultAsync<Client>($"select * from Client where Id={id} ");
+            var client = await connect.QueryFirstOrDefaultAsync<Client>($"select * from Clients where Id={id} ");
             return client;
 
         }
@@ -38,131 +43,52 @@ namespace AccountManagement.Repository
         public async Task<IEnumerable<Client>> GetClients()
         {
             using var connection = _dataBase.CreateConnection();
-            var clients = await connection.QueryAsync<Client>("SELECT * FROM Client");
+            var clients = await connection.QueryAsync<Client>("SELECT * FROM Clients");
             return clients.ToList();
 
         }
 
         public bool Create(Client entity)
         {
-            var connect = _dataBase.CreateConnection();
-            string query =
-                "insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)";
-
-            var rowsAffected = connect.Execute(query, new
-            {
-                entity.Id,
-                entity.FirstName,
-                entity.LastName,
-                entity.Email,
-                entity.Birthday,
-                entity.Phone,
-                entity.DateCreated,
-                entity.DateModified,
-                entity.Username,
-                entity.PasswordHash,
-                entity.PasswordSalt,
-
-            });
-            // var client = connect.ExecuteAsync("insert into Client(FirstName,LastName,Email,Birthday,Phone,DateCreated,DateModified,Username,PasswordHash,PasswordSalt) values (@FirstName,@LastName,@Email,@Birthday,@Phone,@DateCreated,@DateModified,@Username,@PasswordHash,@PasswordSalt)", entity);
-
-            return rowsAffected > 0 ? true : false;
+            _repositoryContext.Clients.Add(entity);
+            return Save();
         }
 
-        public bool CreateNewDto(ClientDto entity)
-        {
-            var connect = _dataBase.CreateConnection();
-            //var client = new Client();
-
-            var client = _mapper.Map<Client>(entity);
-
-         var date=DateTime.Now;
-            string query = $"insert into Client(FirstName,LastName,Email,Birthday,Phone,Username,Password,DateCreated) values  (@FirstName,@LastName,@Email,@Birthday,@Phone,@Username,@Password,@DateCreated)";
-
-
-
-            var rowsAffected = connect.Execute(query, new
-            {
-                client.FirstName,
-                client.LastName,
-                client.Email,
-               client.Birthday,
-               client.Phone,
-               client.Username,
-               client.Password,
-               client.DateCreated
-            });
-
-            /*
-          var rowsAffected = connect.Execute(query, new
-            {
-                FirstName=entity.FirstName,
-                LastName=entity.LastName,
-                Email=entity.Email,
-                Birthday=entity.Birthday,
-                Phone=entity.Phone,
-                Username=entity.Username,
-                Password=entity.Password
-
-            });
-          */
-            return rowsAffected > 0 ? true : false;
-        }
-
-
-
-
+        //  data is coming from DTO , so update based on unique keys that are
         public bool Update(Client entity)
         {
-            throw new NotImplementedException();
+            _repositoryContext.Clients.Update(entity);
+            return Save();
         }
 
 
-        //public bool Update(Client entity)
-        //{
-        //    var connection = _dataBase.CreateConnection();
+        public bool Delete(Client client)
+        {
+            _repositoryContext.Clients.Remove(client);
+            return Save();
+        }
 
 
-        //}
+        public ICollection<Client> FindAll()
+        {
+            var clients = _repositoryContext.Clients.ToList();
+            return clients;
+        }
+        public Client FindById(int id)
+        {
+            var client = _repositoryContext.Clients.Find(id);
+            return client;
+        }
 
-
-
-        /*
-                public bool Delete(Client entity)
-                {
-                    _dataBase.Clients.Remove(entity);
-                    return Save();
-                }
-
-                public ICollection<Client> FindAll()
-                {
-                    var clients = _dataBase.Clients.ToList();
-                    return clients;
-                }
-
-                public Client FindById(int id)
-                {
-                    var client = _dataBase.Clients.Find(id);
-                    return client;
-                }
-
-
-
-
-
-                public bool IsValid(int id)
-                {
-                    var valid = _dataBase.Clients.Any(e => e.Id == id);
-                    return valid;
-                }
-
-                public bool Save()
-                {
-                    var changes = _dataBase.SaveChanges();
-                    return changes > 0;
-                }
-
-            
-                */
+        public bool IsValid(int id)
+        {
+            var valid = _repositoryContext.Clients.Any(e => e.Id == id);
+            return valid;
+        }
+        public bool Save()
+        {
+            var changes = _repositoryContext.SaveChanges();
+            return changes > 0;
+        }
     }
 }

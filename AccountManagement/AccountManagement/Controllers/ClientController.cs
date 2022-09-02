@@ -4,11 +4,13 @@ using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
+using AutoMapper;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using static Dapper.SqlMapper;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AccountManagement.Controllers
@@ -18,15 +20,27 @@ namespace AccountManagement.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _clientRepository;
-
-        public ClientController(IClientRepository clientRepository)
+        private readonly IMapper _mapper;
+        public ClientController(IClientRepository clientRepository, IMapper mapper)
         {
             _clientRepository = clientRepository;
-
+            _mapper = mapper;
         }
 
 
-        [HttpGet]
+
+
+        [HttpPost(nameof(Client))]
+        public IActionResult Create(ClientDto entity)
+        {
+            var entityData = _mapper.Map<Client>(entity);
+            var succeed = _clientRepository.Create(entityData);
+
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+        }
+
+
+        [HttpGet(nameof(DbType))]
         public async Task<IActionResult> GetClients()
         {
             var clients = await _clientRepository.GetClients();
@@ -34,36 +48,40 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpGet("{id}", Name = "ClientById")]
-        public async Task<IActionResult> GetClient(int id)
+        [HttpDelete]
+        public IActionResult Delete(ClientDto client)
         {
-            var client = await _clientRepository.GetClientId(id);
+            var entityData = _mapper.Map<Client>(client);
+            var succeed = _clientRepository.Delete(entityData);
 
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+        }
+
+
+        [HttpGet("{id}", Name = "ClientById")]
+        public IActionResult GetById(int id)
+        {
+            var client = _clientRepository.FindById(id);
             if (client is null)
                 return NotFound();
             return Ok(client);
         }
 
-
-
-        [HttpPost(nameof(Client))]
-        public IActionResult Create(Client entity)
+        [HttpPut(nameof(Client))]
+        public IActionResult Update(Client client)
         {
-            var client = _clientRepository.Create(entity);
-            return Ok(new { Result = true });
+            //     var entity = _mapper.Map<Client>(client);
+            var succeed = _clientRepository.Update(client);
+
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
 
-        [HttpPost(nameof(ClientDto))]
-        public IActionResult CreateNewDto(ClientDto entity)
-        {
-            var client = _clientRepository.CreateNewDto(entity);
-            return Ok(new { Result = true });
-        }
+
+
 
 
     }
-
 
 
 
