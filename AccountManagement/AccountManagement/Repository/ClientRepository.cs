@@ -31,25 +31,19 @@ namespace AccountManagement.Repository
         }
 
 
-
-        public async Task<Client> GetClientId(int id)
-        {
-            using var connect = _dataBase.CreateConnection();
-            var client = await connect.QueryFirstOrDefaultAsync<Client>($"select * from Clients where Id={id} ");
-            return client;
-
-        }
-
-        public async Task<IEnumerable<Client>> GetClients()
+        public async Task<IEnumerable<ClientViewModel>> GetClients()
         {
             using var connection = _dataBase.CreateConnection();
-            var clients = await connection.QueryAsync<Client>("SELECT * FROM Clients");
+            var clients = await connection.QueryAsync<ClientViewModel>("SELECT * FROM Clients");
             return clients.ToList();
 
         }
 
+
         public bool Create(Client entity)
         {
+            entity.DateCreated = DateTime.Now;
+
             _repositoryContext.Clients.Add(entity);
             return Save();
         }
@@ -57,15 +51,25 @@ namespace AccountManagement.Repository
         //  data is coming from DTO , so update based on unique keys that are
         public bool Update(Client entity)
         {
-            _repositoryContext.Clients.Update(entity);
+            var client = GetExistingClient(entity);
+            if (client != null)
+                _repositoryContext.Clients.Update(entity);
             return Save();
         }
 
 
-        public bool Delete(Client client)
+        public bool Delete(Client entity)
         {
-            _repositoryContext.Clients.Remove(client);
-            return Save();
+            var client = GetExistingClient(entity);
+            if (client != null)
+            {
+                _repositoryContext.Clients.Remove(client);
+                return Save();
+            }
+            else
+                return false; //not deleted
+
+
         }
 
 
@@ -74,21 +78,39 @@ namespace AccountManagement.Repository
             var clients = _repositoryContext.Clients.ToList();
             return clients;
         }
-        public Client FindById(int id)
-        {
-            var client = _repositoryContext.Clients.Find(id);
-            return client;
-        }
 
-        public bool IsValid(int id)
+
+        public bool IsValid(int id) //can be deleted
         {
             var valid = _repositoryContext.Clients.Any(e => e.Id == id);
             return valid;
         }
+
+        public Client GetExistingClient(Client entity)
+        {
+            //these values are unique for each record at clients
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == entity.Email);
+            return client;
+            //and the user CANNOT CHANGE [Id,Email] and atributet e tjera ndryshohen
+            //edhe pse email e shikon , ndersa ID jo , behet nje validim per te mos create a new DTO class
+        }
+
         public bool Save()
         {
-            var changes = _repositoryContext.SaveChanges();
-            return changes > 0;
+            try
+            {
+                var changes = _repositoryContext.SaveChanges();
+                return changes > 0;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message+"error while writing changes to db");
+                return false;
+
+            }
+
         }
     }
+
+
 }

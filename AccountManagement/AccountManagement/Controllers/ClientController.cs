@@ -4,11 +4,14 @@ using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
+using AccountManagement.Data.Model;
+using AccountManagement.Repository.Validation;
 using AutoMapper;
 using Dapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using Microsoft.Extensions.Configuration;
 using static Dapper.SqlMapper;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -29,18 +32,25 @@ namespace AccountManagement.Controllers
 
 
 
-
-        [HttpPost(nameof(Client))]
-        public IActionResult Create(ClientDto entity)
+        [HttpPost("Create")]
+        public IActionResult Create(ClientRegistrationDto entity)
         {
+            //CALL VALIDATION METHOD()  for username password
+            //do also validation for existing of UNIQUE ATTRIBUTES
+
+
             var entityData = _mapper.Map<Client>(entity);
+
+            UserValidation validation = new UserValidation(entityData);
+
+
             var succeed = _clientRepository.Create(entityData);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
 
-        [HttpGet(nameof(DbType))]
+        [HttpGet("GetClients")]
         public async Task<IActionResult> GetClients()
         {
             var clients = await _clientRepository.GetClients();
@@ -48,8 +58,8 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpDelete]
-        public IActionResult Delete(ClientDto client)
+        [HttpDelete("Delete")]
+        public IActionResult Delete(ClientViewModel client)
         {
             var entityData = _mapper.Map<Client>(client);
             var succeed = _clientRepository.Delete(entityData);
@@ -58,23 +68,20 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpGet("{id}", Name = "ClientById")]
-        public IActionResult GetById(int id)
+        [HttpPut("Update")]
+        public IActionResult Update(ClientViewModel entity)
         {
-            var client = _clientRepository.FindById(id);
-            if (client is null)
-                return NotFound();
-            return Ok(client);
-        }
-
-        [HttpPut(nameof(Client))]
-        public IActionResult Update(Client client)
-        {
-            //     var entity = _mapper.Map<Client>(client);
+            var client = _mapper.Map<Client>(entity);
             var succeed = _clientRepository.Update(client);
-
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
+
+        [HttpGet("PrintDetailed")]
+        public IActionResult FindAll()
+        {
+            return Ok(_clientRepository.FindAll());
+        }
+
 
 
 

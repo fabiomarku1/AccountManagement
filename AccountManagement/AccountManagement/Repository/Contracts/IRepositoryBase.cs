@@ -10,7 +10,7 @@ namespace AccountManagement.Contracts
     {
         bool Create(T entity);
         ICollection<T> FindAll(); // may be removed
-        T FindById(int id);
+      //  T FindById(int id);
         bool Update(T entity);
         bool Delete(T entity);
         bool Save();

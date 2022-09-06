@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace AccountManagement.Data.DTO
 {
-    public class ClientDto
+    public class ClientRegistrationDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
