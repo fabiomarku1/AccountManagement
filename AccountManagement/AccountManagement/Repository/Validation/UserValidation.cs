@@ -1,10 +1,16 @@
-﻿using System.Security.Cryptography;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountManagement.Repository.Validation
 {
@@ -12,8 +18,16 @@ namespace AccountManagement.Repository.Validation
     {
         // private Client _client;
         private readonly ClientRegistrationDto _clientRegistrationDto;
+        private readonly IConfiguration _configuration;
+
         public UserValidation()
         {
+            _configuration = configuration;
+        }
+        public UserValidation(IConfiguration configuration)
+        {
+            _configuration = configuration;
+
         }
         public UserValidation(ClientRegistrationDto client)
         {
@@ -55,6 +69,37 @@ namespace AccountManagement.Repository.Validation
             client.PasswordHash = passwordHash;
             client.PasswordSalt = passwordSalt;
         }
+
+
+        public string GetToken(Client client)
+        {
+            var claims = new List<Claim>
+            {
+             //   new Claim(ClaimTypes.Authentication,client.Id.ToString()),
+                new Claim(ClaimTypes.Email,client.Email),
+                new Claim(ClaimTypes.Name,client.Username)
+
+            };
+
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings").Value
+            ));
+
+            var credintials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            var createJwtSecurityToken = new JwtSecurityToken(
+                claims:claims,
+                expires:DateTime.Now.AddMinutes(30),
+                signingCredentials:credintials
+            );
+
+            var token = new JwtSecurityTokenHandler().WriteToken(createJwtSecurityToken);
+
+            return token;
+
+        }
+
 
         /*
          *   public void HashClient(Client client,ClientRepository repository) //for an update , this is going to be called , edhe pse do therritet kot 

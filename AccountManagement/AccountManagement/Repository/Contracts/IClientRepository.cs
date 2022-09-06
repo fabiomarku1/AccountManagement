@@ -12,6 +12,8 @@ namespace AccountManagement.Contracts
     {
         public Task<IEnumerable<ClientViewModel>> GetClients();
 
+        public Client Login(ClientLogin client);
+
         //  public ICollection<ClientViewModel> FindAllModelClients();
         /**/
     }

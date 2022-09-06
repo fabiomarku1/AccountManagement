@@ -52,11 +52,14 @@ namespace AccountManagement.Repository
         public bool Update(Client entity)
         {
             var client = GetExistingClient(entity);
-
+            
 
             if (client != null)
-                _repositoryContext.Clients.Update(client);
-            return Save();
+            {
+          //      entity.Id=client.Id;
+                _repositoryContext.Clients.Update(entity);
+            }
+                return Save();
         }
 
 
@@ -96,6 +99,16 @@ namespace AccountManagement.Repository
             //and the user CANNOT CHANGE [Id,Email] and atributet e tjera ndryshohen
             //edhe pse email e shikon , ndersa ID jo , behet nje validim per te mos create a new DTO class
         }
+
+
+        public Client Login(ClientLogin client)
+        {
+       //     var cl = _repositoryContext.Clients.First(e => e.Username == client.Username);
+            var getClient = _repositoryContext.Clients.FirstOrDefault(e => e.Username == client.Username);
+           // var success= _repositoryContext.Clients.Any(e => e.Username == client.Username);
+           return getClient;
+        }
+
 
         public bool Save()
         {

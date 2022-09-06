@@ -24,10 +24,13 @@ namespace AccountManagement.Controllers
     {
         private readonly IClientRepository _clientRepository;
         private readonly IMapper _mapper;
-        public ClientController(IClientRepository clientRepository, IMapper mapper)
+        private readonly IConfiguration _config;
+        
+        public ClientController(IClientRepository clientRepository, IMapper mapper,IConfiguration configuration)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;
+            _config = configuration;
         }
 
 
@@ -70,7 +73,7 @@ namespace AccountManagement.Controllers
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
-
+        //================================================================================================
         [HttpPut("Update")]
         public IActionResult Update(ClientRegistrationDto entity)
         {
@@ -86,6 +89,7 @@ namespace AccountManagement.Controllers
             var succeed = _clientRepository.Update(client);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
+        //==================================================================================================
 
         [HttpGet("PrintDetailed")]
         public IActionResult FindAll()
@@ -95,14 +99,23 @@ namespace AccountManagement.Controllers
 
 
 
+        [HttpPost("Login")]
+        public ActionResult<string> Login(ClientLogin input)
+        {
+            var client=_clientRepository.Login(input);
 
+            var validation = new UserValidation();
 
+            string token = validation.GetToken(client);
+
+            //var isSuccesful = _clientRepository.Login(input);
+            if (client==null)
+                return BadRequest("incorrect");
+            return token;
+
+        }
 
 
     }
-
-
-
-
 
 }
