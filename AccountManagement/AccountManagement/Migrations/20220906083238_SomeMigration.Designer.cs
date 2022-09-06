@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccountManagement.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20220902072832_FromLaptop")]
-    partial class FromLaptop
+    [Migration("20220906083238_SomeMigration")]
+    partial class SomeMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -140,9 +140,6 @@ namespace AccountManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("PasswordHash")

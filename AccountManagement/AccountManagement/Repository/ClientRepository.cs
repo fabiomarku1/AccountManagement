@@ -52,8 +52,10 @@ namespace AccountManagement.Repository
         public bool Update(Client entity)
         {
             var client = GetExistingClient(entity);
+
+
             if (client != null)
-                _repositoryContext.Clients.Update(entity);
+                _repositoryContext.Clients.Update(client);
             return Save();
         }
 
@@ -104,7 +106,7 @@ namespace AccountManagement.Repository
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.Message+"error while writing changes to db");
+                Console.WriteLine(e.Message + "error while writing changes to db");
                 return false;
 
             }

@@ -13,7 +13,6 @@ namespace AccountManagement.Data.DTO
         public string Phone { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        // public DateTime DateCreated { get; set; } = DateTime.Now;//?????????????
 
         // public byte[] PasswordHash { get; set; } 
         // public byte[] PasswordSalt { get; set; }

@@ -33,19 +33,22 @@ namespace AccountManagement.Controllers
 
 
         [HttpPost("Create")]
-        public IActionResult Create(ClientRegistrationDto entity)
+        public IActionResult Create(ClientRegistrationDto request)
         {
             //CALL VALIDATION METHOD()  for username password
             //do also validation for existing of UNIQUE ATTRIBUTES
 
+            var validation = new UserValidation(request);
+            if (!validation.ValidateThisClient())
+                return BadRequest("Input not correct");
+            //if validation wrong =>  exit/return error 
+            // no need to go to repository
 
-            var entityData = _mapper.Map<Client>(entity);
+            var entity = _mapper.Map<Client>(request);
 
-            UserValidation validation = new UserValidation(entityData);
+            validation.HashClient(entity);
 
-
-            var succeed = _clientRepository.Create(entityData);
-
+            var succeed = _clientRepository.Create(entity);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
@@ -69,9 +72,17 @@ namespace AccountManagement.Controllers
 
 
         [HttpPut("Update")]
-        public IActionResult Update(ClientViewModel entity)
+        public IActionResult Update(ClientRegistrationDto entity)
         {
+            var validation = new UserValidation(entity);
+
+            if (!validation.ValidateThisClient())
+                return BadRequest("Input not correct");
+
+
+
             var client = _mapper.Map<Client>(entity);
+            validation.HashClient(client);
             var succeed = _clientRepository.Update(client);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }

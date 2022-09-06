@@ -16,6 +16,7 @@ namespace AccountManagement.Data
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; } = DateTime.Now;
 
+
         public string Username { get; set; } //unique
         public byte[] PasswordHash { get; set; } //need to be hashed
         public byte[] PasswordSalt { get; set; }
