@@ -82,7 +82,7 @@ namespace AccountManagement.Repository.Validation
         }
 
 
-        public string GetToken(Client client, IConfiguration _configuration)
+        public string GetToken(Client client, IConfiguration configuration)
         {
             var claims = new List<Claim>
             {
@@ -94,15 +94,15 @@ namespace AccountManagement.Repository.Validation
 
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings:Token").Value
+                configuration.GetSection("AppSettings:Token").Value
             ));
 
-            var credintials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var createJwtSecurityToken = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credintials
+                signingCredentials: credentials
             );
 
             var token = new JwtSecurityTokenHandler().WriteToken(createJwtSecurityToken);

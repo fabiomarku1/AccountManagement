@@ -22,7 +22,7 @@ namespace AccountManagement.Repository.Validation
         }
 
 
-        public bool ValidateThisClient()
+        public bool ValidateFields()
         {
             return (Regex.IsMatch(_clientRegistration.FirstName, "^\\S+$") && //no whitespace
                     Regex.IsMatch(_clientRegistration.LastName, "^\\S+$") && //no whitespace
@@ -34,13 +34,8 @@ namespace AccountManagement.Repository.Validation
                     Regex.IsMatch(_clientRegistration.Phone, @"^\+?[0-9][0-9]{7,12}$")
                 );
 
-        }
+        }//create a dictinary for the error output
 
-
-        public bool HashClient()
-        {
-            throw new System.NotImplementedException();
-        }
 
         public void HashClient(Client client) //for an update , this is going to be called , edhe pse do therritet kot 
         {
@@ -62,11 +57,10 @@ namespace AccountManagement.Repository.Validation
         public bool CheckForChanges(Client request, ClientRegistrationDto loginRequest)
         {
             return VerifyPassword(loginRequest.Password, request.PasswordHash, request.PasswordSalt);
-
         }
 
 
-        private bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt)
+        public bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var crypto = new HMACSHA512(passwordSalt))
             {

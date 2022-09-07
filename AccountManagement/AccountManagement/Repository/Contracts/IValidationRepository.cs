@@ -7,15 +7,14 @@ namespace AccountManagement.Repository.Contracts
     public interface IValidationRepository<T>
     {
 
-        bool ValidateThisClient();
+        bool ValidateFields();
 
-        bool HashClient();
+        void HashClient(Client client);
 
-        bool CheckForChanges(Client client, ClientRegistrationDto requestDto);
+        //   bool CheckForChanges(Client client, ClientRegistrationDto requestDto);
 
         void CreatePassword(string password, out byte[] passwordHash, out byte[] passwordSalt);
-
-
-
+        bool VerifyPassword(string password, byte[] passwordHash, byte[] passwordSalt);
     }
 }
+

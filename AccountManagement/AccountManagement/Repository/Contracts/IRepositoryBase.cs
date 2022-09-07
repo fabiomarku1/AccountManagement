@@ -14,7 +14,7 @@ namespace AccountManagement.Contracts
         bool Update(T entity);
         bool Delete(T entity);
         bool Save();
-        bool IsValid(int id);
+        //bool IsValid(int id);
         /*
 
 

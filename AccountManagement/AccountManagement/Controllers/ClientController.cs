@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using static Dapper.SqlMapper;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -40,7 +41,7 @@ namespace AccountManagement.Controllers
         {
             var validation = new ClientRegisterValidation(request);
 
-            if (!validation.ValidateThisClient())
+            if (!validation.ValidateFields())
                 return BadRequest("Input not correct");
             //if validation wrong =>  exit/return error 
             // no need to go to repository
@@ -82,16 +83,18 @@ namespace AccountManagement.Controllers
         {
             var validation = new ClientRegisterValidation(entity);
 
-            if (!validation.ValidateThisClient())
+            if (!validation.ValidateFields())
                 return BadRequest("Input not correct");
 
-
-
+            var entityData = _clientRepository.GetExistingClient(entity);
             var client = _mapper.Map<Client>(entity);
 
-            var entityData = _clientRepository.GetExistingClient(entity);
 
-            var mapped = _mapper.Map(client, entityData);
+                //    var newCLient = _mapper.Map<ClientRegistrationDto, Client>(entity);
+
+            
+
+            var mapped = _mapper.Map(entityData,client);
 
             if (!validation.CheckForChanges(mapped, entity))
                 validation.HashClient(mapped);
@@ -115,18 +118,24 @@ namespace AccountManagement.Controllers
         [HttpPost("Login")]
         public ActionResult<string> Login(ClientLogin input)
         {
-            var validation = new UserValidation();
+            var validation = new ClientLoginValidation(input);
 
-            var client = _clientRepository.Login(input, validation);
+            if (!validation.ValidateFields())
+                return BadRequest("failed at validation , create a list of error fields");
 
-            if (client == null)
-                return BadRequest("login failed");
 
-            var token = validation.GetToken(client, _config);
 
-            //var isSuccesful = _clientRepository.Login(input);
+            var dbClient = _clientRepository.GetExistingClient(input);
 
-            return token;
+            if (validation.ValidateLogin(dbClient))
+            {
+                var token = validation.GetToken(dbClient, _config);
+                return token;
+            }
+            else
+            {
+                return Ok(new { Result = "Invalid login" });
+            }
 
         }
 

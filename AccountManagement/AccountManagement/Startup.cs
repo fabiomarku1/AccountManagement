@@ -46,6 +46,10 @@ namespace AccountManagement
 
 
             services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+           // services.AddScoped<IClientRepository, ClientRepository>();
+          //  services.AddScoped<IClientRepository, ClientRepository>();
             services.AddAutoMapper(typeof(Mapper));
         }
 

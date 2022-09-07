@@ -89,6 +89,8 @@ namespace AccountManagement.Repository
             return valid;
         }
 
+
+
         public Client GetExistingClient(Client entity)
         {
             //these values are unique for each record at clients
@@ -97,33 +99,19 @@ namespace AccountManagement.Repository
             //and the user CANNOT CHANGE [Id,Email] and atributet e tjera ndryshohen
             //edhe pse email e shikon , ndersa ID jo , behet nje validim per te mos create a new DTO class
         }
+
         public Client GetExistingClient(ClientRegistrationDto entity)
         {
             var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == entity.Email);
             return client;
         }
 
-
-        public Client Login(ClientLogin request, UserValidation validation)
+        public Client GetExistingClient(ClientLogin entity)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Username == request.Username);
-
-            if (client == null)
-            {
-                return null;
-            }
-            var requestMap = _mapper.Map<Client>(request);
-
-            validation.HashClient(requestMap);
-
-
-            if (requestMap.PasswordHash == client.PasswordHash && requestMap.PasswordSalt == client.PasswordSalt)
-                return client;
-
-
-            return null;
-
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Username == entity.Username);
+            return client;
         }
+
 
 
         public bool Save()
