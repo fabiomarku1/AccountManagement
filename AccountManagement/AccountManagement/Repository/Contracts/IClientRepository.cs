@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.Repository.Validation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountManagement.Contracts
 {
@@ -12,7 +14,9 @@ namespace AccountManagement.Contracts
     {
         public Task<IEnumerable<ClientViewModel>> GetClients();
 
-        public Client Login(ClientLogin client);
+        public Client Login(ClientLogin client, UserValidation validation);
+        public Client GetExistingClient(Client entity);
+        public Client GetExistingClient(ClientRegistrationDto entity);
 
         //  public ICollection<ClientViewModel> FindAllModelClients();
         /**/

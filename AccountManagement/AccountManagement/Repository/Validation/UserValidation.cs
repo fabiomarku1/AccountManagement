@@ -16,23 +16,23 @@ namespace AccountManagement.Repository.Validation
 {
     public class UserValidation
     {
-        // private Client _client;
         private readonly ClientRegistrationDto _clientRegistrationDto;
-        private readonly IConfiguration _configuration;
+        private readonly ClientLogin _clientLogin;
 
         public UserValidation()
         {
-            _configuration = configuration;
+            //_configuration = configuration;
         }
-        public UserValidation(IConfiguration configuration)
-        {
-            _configuration = configuration;
 
-        }
         public UserValidation(ClientRegistrationDto client)
         {
             _clientRegistrationDto = client;
 
+        }
+
+        public UserValidation(ClientLogin client)
+        {
+            _clientLogin = client;
         }
 
 
@@ -70,8 +70,19 @@ namespace AccountManagement.Repository.Validation
             client.PasswordSalt = passwordSalt;
         }
 
+        private void CreatePassword(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var crypto = new HMACSHA512())
+            {
+                passwordSalt = crypto.Key;
+                passwordHash = crypto.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
 
-        public string GetToken(Client client)
+
+        }
+
+
+        public string GetToken(Client client, IConfiguration _configuration)
         {
             var claims = new List<Claim>
             {
@@ -83,15 +94,15 @@ namespace AccountManagement.Repository.Validation
 
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
-                _configuration.GetSection("AppSettings").Value
+                _configuration.GetSection("AppSettings:Token").Value
             ));
 
             var credintials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var createJwtSecurityToken = new JwtSecurityToken(
-                claims:claims,
-                expires:DateTime.Now.AddMinutes(30),
-                signingCredentials:credintials
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(30),
+                signingCredentials: credintials
             );
 
             var token = new JwtSecurityTokenHandler().WriteToken(createJwtSecurityToken);
@@ -116,18 +127,6 @@ namespace AccountManagement.Repository.Validation
             client.PasswordSalt = passwordSalt;
         }
          */
-
-
-        private void CreatePassword(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            using (var crypto = new HMACSHA512())
-            {
-                passwordSalt = crypto.Key;
-                passwordHash = crypto.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-
-
-        }
 
     }
 }

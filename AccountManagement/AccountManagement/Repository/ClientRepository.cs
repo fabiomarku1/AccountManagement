@@ -11,7 +11,10 @@ using System;
 using System.Reflection.Metadata;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.Repository.Validation;
 using AutoMapper;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountManagement.Repository
 {
@@ -51,29 +54,24 @@ namespace AccountManagement.Repository
         //  data is coming from DTO , so update based on unique keys that are
         public bool Update(Client entity)
         {
-            var client = GetExistingClient(entity);
-            
+            //  var client = GetExistingClient(entity);
 
-            if (client != null)
-            {
-          //      entity.Id=client.Id;
-                _repositoryContext.Clients.Update(entity);
-            }
-                return Save();
+
+            //  if (client != null)
+            //   {
+            //      entity.Id=client.Id;
+            _repositoryContext.Clients.Update(entity);
+            //  }
+            return Save();
         }
 
 
         public bool Delete(Client entity)
         {
-            var client = GetExistingClient(entity);
-            if (client != null)
-            {
-                _repositoryContext.Clients.Remove(client);
-                return Save();
-            }
-            else
-                return false; //not deleted
 
+                _repositoryContext.Clients.Remove(entity);
+                return Save();
+            
 
         }
 
@@ -99,14 +97,32 @@ namespace AccountManagement.Repository
             //and the user CANNOT CHANGE [Id,Email] and atributet e tjera ndryshohen
             //edhe pse email e shikon , ndersa ID jo , behet nje validim per te mos create a new DTO class
         }
-
-
-        public Client Login(ClientLogin client)
+        public Client GetExistingClient(ClientRegistrationDto entity)
         {
-       //     var cl = _repositoryContext.Clients.First(e => e.Username == client.Username);
-            var getClient = _repositoryContext.Clients.FirstOrDefault(e => e.Username == client.Username);
-           // var success= _repositoryContext.Clients.Any(e => e.Username == client.Username);
-           return getClient;
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == entity.Email);
+            return client;
+        }
+
+
+        public Client Login(ClientLogin request, UserValidation validation)
+        {
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Username == request.Username);
+
+            if (client == null)
+            {
+                return null;
+            }
+            var requestMap = _mapper.Map<Client>(request);
+
+            validation.HashClient(requestMap);
+
+
+            if (requestMap.PasswordHash == client.PasswordHash && requestMap.PasswordSalt == client.PasswordSalt)
+                return client;
+
+
+            return null;
+
         }
 
 

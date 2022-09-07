@@ -25,8 +25,8 @@ namespace AccountManagement.Controllers
         private readonly IClientRepository _clientRepository;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
-        
-        public ClientController(IClientRepository clientRepository, IMapper mapper,IConfiguration configuration)
+
+        public ClientController(IClientRepository clientRepository, IMapper mapper, IConfiguration configuration)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;
@@ -38,10 +38,8 @@ namespace AccountManagement.Controllers
         [HttpPost("Create")]
         public IActionResult Create(ClientRegistrationDto request)
         {
-            //CALL VALIDATION METHOD()  for username password
-            //do also validation for existing of UNIQUE ATTRIBUTES
+            var validation = new ClientRegisterValidation(request);
 
-            var validation = new UserValidation(request);
             if (!validation.ValidateThisClient())
                 return BadRequest("Input not correct");
             //if validation wrong =>  exit/return error 
@@ -65,9 +63,14 @@ namespace AccountManagement.Controllers
 
 
         [HttpDelete("Delete")]
-        public IActionResult Delete(ClientViewModel client)
+        public IActionResult Delete(ClientViewModel request)
         {
-            var entityData = _mapper.Map<Client>(client);
+            var client = _mapper.Map<Client>(request);
+
+            var entityData = _clientRepository.GetExistingClient(client);
+
+            // _mapper.Map(entityData, client);
+
             var succeed = _clientRepository.Delete(entityData);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
@@ -77,7 +80,7 @@ namespace AccountManagement.Controllers
         [HttpPut("Update")]
         public IActionResult Update(ClientRegistrationDto entity)
         {
-            var validation = new UserValidation(entity);
+            var validation = new ClientRegisterValidation(entity);
 
             if (!validation.ValidateThisClient())
                 return BadRequest("Input not correct");
@@ -85,8 +88,18 @@ namespace AccountManagement.Controllers
 
 
             var client = _mapper.Map<Client>(entity);
-            validation.HashClient(client);
-            var succeed = _clientRepository.Update(client);
+
+            var entityData = _clientRepository.GetExistingClient(entity);
+
+            var mapped = _mapper.Map(client, entityData);
+
+            if (!validation.CheckForChanges(mapped, entity))
+                validation.HashClient(mapped);
+
+            //if (!validation.CheckForChanges(_clientRepository.GetExistingClient(client), entity))
+            //    validation.HashClient(client);
+
+            var succeed = _clientRepository.Update(mapped);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
         //==================================================================================================
@@ -102,15 +115,17 @@ namespace AccountManagement.Controllers
         [HttpPost("Login")]
         public ActionResult<string> Login(ClientLogin input)
         {
-            var client=_clientRepository.Login(input);
-
             var validation = new UserValidation();
 
-            string token = validation.GetToken(client);
+            var client = _clientRepository.Login(input, validation);
+
+            if (client == null)
+                return BadRequest("login failed");
+
+            var token = validation.GetToken(client, _config);
 
             //var isSuccesful = _clientRepository.Login(input);
-            if (client==null)
-                return BadRequest("incorrect");
+
             return token;
 
         }

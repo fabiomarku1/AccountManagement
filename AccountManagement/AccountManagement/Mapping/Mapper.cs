@@ -14,6 +14,7 @@ namespace AccountManagement.Mapping
 
             CreateMap<Client, ClientViewModel>().ReverseMap();
 
+            CreateMap<Client, ClientLogin>().ReverseMap();
             //CreateMap<Client, ClientDto>().ReverseMap();
         }
     }
