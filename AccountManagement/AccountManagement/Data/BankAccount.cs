@@ -11,14 +11,14 @@ namespace AccountManagement.Data
         public string Name { get; set; }
 
      [ForeignKey("CurrencyId")]  
-     public Currency RequestingCurrency { get; set; }
+     public Currency Currency { get; set; }
      public int CurrencyId { get; set; }
 
 
      public decimal Balance { get; set; }
 
      [ForeignKey("ClientId")]
-     public Client RequestingClient { get; set; }
+     public Client Client { get; set; }
      public int ClientId { get; set; }
 
      public bool IsActive { get; set; }

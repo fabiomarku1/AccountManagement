@@ -68,41 +68,35 @@ namespace AccountManagement.Controllers
         {
             var client = _mapper.Map<Client>(request);
 
-            var entityData = _clientRepository.GetExistingClient(client);
+            client.Id = _clientRepository.GetClientId(request);
 
-            // _mapper.Map(entityData, client);
-
-            var succeed = _clientRepository.Delete(entityData);
+            var succeed = _clientRepository.Delete(client);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
         //================================================================================================
         [HttpPut("Update")]
-        public IActionResult Update(ClientRegistrationDto entity)
+        public IActionResult Update(ClientRegistrationDto request)
         {
-            var validation = new ClientRegisterValidation(entity);
+            var validation = new ClientRegisterValidation(request);
 
             if (!validation.ValidateFields())
                 return BadRequest("Input not correct");
 
-            var entityData = _clientRepository.GetExistingClient(entity);
-            var client = _mapper.Map<Client>(entity);
 
 
-                //    var newCLient = _mapper.Map<ClientRegistrationDto, Client>(entity);
+            var existingClient = _clientRepository.GetExistingClient(request);
 
-            
+            var newClient = _mapper.Map<Client>(request);
+            newClient.Id = _clientRepository.GetClientId(request);
 
-            var mapped = _mapper.Map(entityData,client);
 
-            if (!validation.CheckForChanges(mapped, entity))
-                validation.HashClient(mapped);
 
-            //if (!validation.CheckForChanges(_clientRepository.GetExistingClient(client), entity))
-            //    validation.HashClient(client);
+            if (!validation.CheckForChanges(existingClient, newClient, request))//for the password / no need to hash it if its the same password
+                validation.HashClient(newClient); //else , hash the new password the mapped_client
 
-            var succeed = _clientRepository.Update(mapped);
+            var succeed = _clientRepository.Update(newClient);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
         //==================================================================================================
@@ -130,7 +124,8 @@ namespace AccountManagement.Controllers
             if (validation.ValidateLogin(dbClient))
             {
                 var token = validation.GetToken(dbClient, _config);
-                return token;
+                return Ok(new { AccessToken = token });
+                //return token;
             }
             else
             {

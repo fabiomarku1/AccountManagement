@@ -38,8 +38,8 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpGet("GetCurrencies")]
-        public async Task<IActionResult> GetClients()
+        [HttpGet("GetCategories")]
+        public async Task<IActionResult> GetCategories()
         {
             var currencies = await _categoryRepository.GetCategories();
             return Ok(currencies);

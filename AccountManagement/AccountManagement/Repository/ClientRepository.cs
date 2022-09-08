@@ -22,14 +22,12 @@ namespace AccountManagement.Repository
     {
 
         private readonly DapperDbContext _dataBase;
-        private readonly IMapper _mapper;
         private readonly RepositoryContext _repositoryContext;
 
 
-        public ClientRepository(DapperDbContext dataBase, IMapper mapper, RepositoryContext repositoryContext)
+        public ClientRepository(DapperDbContext dataBase, RepositoryContext repositoryContext)
         {
             _dataBase = dataBase;
-            _mapper = mapper;
             _repositoryContext = repositoryContext;
         }
 
@@ -54,25 +52,15 @@ namespace AccountManagement.Repository
         //  data is coming from DTO , so update based on unique keys that are
         public bool Update(Client entity)
         {
-            //  var client = GetExistingClient(entity);
-
-
-            //  if (client != null)
-            //   {
-            //      entity.Id=client.Id;
             _repositoryContext.Clients.Update(entity);
-            //  }
             return Save();
         }
 
 
         public bool Delete(Client entity)
         {
-
-                _repositoryContext.Clients.Remove(entity);
-                return Save();
-            
-
+            _repositoryContext.Clients.Remove(entity);
+            return Save();
         }
 
 
@@ -82,23 +70,6 @@ namespace AccountManagement.Repository
             return clients;
         }
 
-
-        public bool IsValid(int id) //can be deleted
-        {
-            var valid = _repositoryContext.Clients.Any(e => e.Id == id);
-            return valid;
-        }
-
-
-
-        public Client GetExistingClient(Client entity)
-        {
-            //these values are unique for each record at clients
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == entity.Email);
-            return client;
-            //and the user CANNOT CHANGE [Id,Email] and atributet e tjera ndryshohen
-            //edhe pse email e shikon , ndersa ID jo , behet nje validim per te mos create a new DTO class
-        }
 
         public Client GetExistingClient(ClientRegistrationDto entity)
         {
@@ -128,6 +99,24 @@ namespace AccountManagement.Repository
 
             }
 
+        }
+
+        public int GetClientId(ClientRegistrationDto request)
+        {
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email);//email si me priority , user can change all filed, expect email
+            _repositoryContext.ChangeTracker.Clear();
+            if (client != null)
+                return client.Id;
+            return -1;
+        }
+
+        public int GetClientId(ClientViewModel request)
+        {
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email && e.Phone == request.Phone); //both unique
+            _repositoryContext.ChangeTracker.Clear();
+            if (client != null)
+                return client.Id;
+            return -1;
         }
     }
 

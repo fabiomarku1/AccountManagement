@@ -56,16 +56,28 @@ namespace AccountManagement.Repository
 
         public int GetCategoryId(CategoryViewModel request)
         {
-            var category=_repositoryContext.Categories.FirstOrDefault(e=> e.Code==request.Code);
+            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Code == request.Code);
             _repositoryContext.ChangeTracker.Clear();
-            return category.Id;
+            if (category != null)
+                return category.Id;
+            return -1;
         }
 
 
-        public bool Save()
+        public bool Save() //change return value to an error
         {
-            var nrOfRowsAffected = _repositoryContext.SaveChanges();
-            return nrOfRowsAffected > 0;
+            try
+            {
+                var nrOfRowsAffected = _repositoryContext.SaveChanges();
+                return nrOfRowsAffected > 0;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "error while writing changes to db");
+                return false;
+
+            }
+
         }
 
     }

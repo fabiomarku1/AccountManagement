@@ -54,9 +54,16 @@ namespace AccountManagement.Repository.Validation
         }
 
 
-        public bool CheckForChanges(Client request, ClientRegistrationDto loginRequest)
+        public bool CheckForChanges(Client request,Client newClient, ClientRegistrationDto loginRequest)
         {
-            return VerifyPassword(loginRequest.Password, request.PasswordHash, request.PasswordSalt);
+            if (VerifyPassword(loginRequest.Password, request.PasswordHash, request.PasswordSalt))
+            {
+                newClient.PasswordHash = request.PasswordHash;
+                newClient.PasswordSalt = request.PasswordSalt;
+                return true;
+            }
+
+            return false;
         }
 
 

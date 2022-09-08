@@ -53,7 +53,7 @@ namespace AccountManagement.Repository
         }
 
 
-        public bool Save()
+        public bool Save() //throw expection here for DUPLICATE UNIQUE data
         {
             var numberRowsAffected = _repositoryContext.SaveChanges();
             return numberRowsAffected > 0;
