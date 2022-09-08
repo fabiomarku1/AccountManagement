@@ -71,6 +71,7 @@ namespace AccountManagement.Controllers
         public IActionResult FindAll()
         {
             return Ok(_categoryRepository.FindAll());
+
         }
     }
 }

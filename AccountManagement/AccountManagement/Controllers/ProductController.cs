@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
@@ -18,12 +19,14 @@ namespace AccountManagement.Controllers
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly IConfiguration _config;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper, IConfiguration configuration)
+        public ProductController(IProductRepository productRepository, IMapper mapper, IConfiguration configuration, ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _config = configuration;
+            _categoryRepository = categoryRepository;
         }
 
 
@@ -33,6 +36,12 @@ namespace AccountManagement.Controllers
         public IActionResult Create(ProductViewModel request)
         {
             var product = _mapper.Map<Product>(request);
+
+            product.Category = _categoryRepository.GetCategory(request.CategoryId);
+
+         //   var category = categoryRepository.GetCategory(request.CategoryId);
+            //var cateogry
+
             var succeed = _productRepository.Create(product);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
@@ -67,5 +76,11 @@ namespace AccountManagement.Controllers
         {
             return Ok(_productRepository.FindAll());
         }
-    }
+
+        //[HttpGet("{id}")]
+        //public Task<ActionResult<List<Product>>> GetCategoriesAtProducts(int id)
+        //{
+        //    var product=_productRepository.
+        //}
+}
 }

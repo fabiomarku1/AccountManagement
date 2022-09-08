@@ -15,6 +15,11 @@ namespace AccountManagement.Repository
         private readonly DapperDbContext _dataBase;
         private readonly RepositoryContext _repositoryContext;
 
+        public CategoryRepository()
+        {
+            
+        }
+
         public CategoryRepository(DapperDbContext dataBase, RepositoryContext repositoryContext)
         {
             _dataBase = dataBase;
@@ -61,6 +66,12 @@ namespace AccountManagement.Repository
             if (category != null)
                 return category.Id;
             return -1;
+        }
+
+        public Category GetCategory(int id)
+        {
+            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Id==id);
+            return category;
         }
 
 

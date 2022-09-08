@@ -14,12 +14,14 @@ namespace AccountManagement.Repository
 
         private readonly DapperDbContext _dataBase;
         private readonly RepositoryContext _repositoryContext;
+        private readonly ICategoryRepository _categoryRepository;
 
 
-        public ProductRepository(DapperDbContext dataBase, RepositoryContext repositoryContext)
+        public ProductRepository(DapperDbContext dataBase, RepositoryContext repositoryContext, ICategoryRepository categoryRepository)
         {
             _dataBase = dataBase;
             _repositoryContext = repositoryContext;
+            _categoryRepository = categoryRepository;
         }
 
 
@@ -63,6 +65,15 @@ namespace AccountManagement.Repository
                 return product.Id;
             return -1;
         }
+
+        
+        //public async Task<IEnumerable<CategoryViewModel>> GetCategoryAtProducts()
+        //{
+        //    using var connection = _dataBase.CreateConnection();
+        //    var catepAsync = await connection.QueryAsync<CategoryViewModel>("select * from Categories c,Product p where p.CategoryId=c.Id ");
+        //    return catepAsync.ToList();
+        //}
+
 
         public bool Save()
         {

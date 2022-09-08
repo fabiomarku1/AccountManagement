@@ -9,5 +9,7 @@ namespace AccountManagement.Contracts
     {
         public Task<IEnumerable<CategoryViewModel>> GetCategories();
         public int GetCategoryId(CategoryViewModel request);
+
+        public Category GetCategory(int id);
     }
 }

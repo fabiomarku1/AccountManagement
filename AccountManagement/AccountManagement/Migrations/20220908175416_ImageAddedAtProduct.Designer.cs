@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccountManagement.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20220908105820_ChangedProduct")]
-    partial class ChangedProduct
+    [Migration("20220908175416_ImageAddedAtProduct")]
+    partial class ImageAddedAtProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
