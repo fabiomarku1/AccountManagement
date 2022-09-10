@@ -16,23 +16,22 @@ namespace AccountManagement.Repository.Validation
     public class ClientLoginValidation : IValidationRepository<ClientLogin>
     {
         private readonly ClientLogin _clientLogin;
-
         public ClientLoginValidation(ClientLogin clientLogin)
         {
             _clientLogin = clientLogin;
         }
 
-        public bool ValidateLogin(Client client )
+        public bool ValidateLogin(Client client)
         {
-             //   var client = repositoryContext.Clients.FirstOrDefault(e => e.Username == _clientLogin.Username);
+            //   var client = repositoryContext.Clients.FirstOrDefault(e => e.Username == _clientLogin.Username);
 
-                if (client == null)
-                {
-                    return false;
-                }
+            if (client == null)
+            {
+                return false;
+            }
 
-                return (VerifyPassword(_clientLogin.Password, client.PasswordHash, client.PasswordSalt) &&
-                        _clientLogin.Username.Equals(client.Username));
+            return (VerifyPassword(_clientLogin.Password, client.PasswordHash, client.PasswordSalt) &&
+                    _clientLogin.Username.Equals(client.Username));
 
         }
 
@@ -65,9 +64,11 @@ namespace AccountManagement.Repository.Validation
 
         public bool ValidateFields()
         {
-            return(Regex.IsMatch(_clientLogin.Username, @"^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$") && // . and _ allowed
-                   Regex.IsMatch(_clientLogin.Password, @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$") );
+            return (Regex.IsMatch(_clientLogin.Username,
+                @"^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"));
+
         }
+
 
         public string GetToken(Client client, IConfiguration configuration)
         {

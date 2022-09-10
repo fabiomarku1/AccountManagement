@@ -21,7 +21,8 @@ namespace AccountManagement.Controllers
         private readonly IConfiguration _config;
         private readonly ICategoryRepository _categoryRepository;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper, IConfiguration configuration, ICategoryRepository categoryRepository)
+        public ProductController(IProductRepository productRepository, IMapper mapper, IConfiguration configuration,
+            ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
@@ -37,9 +38,10 @@ namespace AccountManagement.Controllers
         {
             var product = _mapper.Map<Product>(request);
 
-            product.Category = _categoryRepository.GetCategory(request.CategoryId);
+            //product.Category = _categoryRepository.GetCategory(request.CategoryId);
+            // product.Category = _categoryRepository.GetCategory(request.CategoryId);
 
-         //   var category = categoryRepository.GetCategory(request.CategoryId);
+            //   var category = categoryRepository.GetCategory(request.CategoryId);
             //var cateogry
 
             var succeed = _productRepository.Create(product);
@@ -74,13 +76,24 @@ namespace AccountManagement.Controllers
         [HttpGet("PrintDetailed")]
         public IActionResult FindAll()
         {
+            //   _productRepository.test();
             return Ok(_productRepository.FindAll());
         }
+
+
+        [HttpGet("getallTEst")]
+        public async Task<IActionResult> GetCategorisAtProduct()
+        {
+            var products = await _productRepository.GetCategoryAtProducts();
+            return Ok(products);
+        }
+
 
         //[HttpGet("{id}")]
         //public Task<ActionResult<List<Product>>> GetCategoriesAtProducts(int id)
         //{
         //    var product=_productRepository.
         //}
+    }
 }
-}
+

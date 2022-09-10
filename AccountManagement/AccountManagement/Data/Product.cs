@@ -12,8 +12,10 @@ namespace AccountManagement.Data
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
 
-        [ForeignKey("CategoryId")]
+
         public Category Category { get; set; }
+
+        [ForeignKey("CategoryId")]
         public int CategoryId { get; set; }
 
 

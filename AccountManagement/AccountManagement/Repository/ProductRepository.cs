@@ -28,7 +28,7 @@ namespace AccountManagement.Repository
         public bool Create(Product entity)
         {
             entity.DateCreated = DateTime.Now;
-            
+
             _repositoryContext.Products.Add(entity);
             return Save();
         }
@@ -66,13 +66,22 @@ namespace AccountManagement.Repository
             return -1;
         }
 
-        
-        //public async Task<IEnumerable<CategoryViewModel>> GetCategoryAtProducts()
-        //{
-        //    using var connection = _dataBase.CreateConnection();
-        //    var catepAsync = await connection.QueryAsync<CategoryViewModel>("select * from Categories c,Product p where p.CategoryId=c.Id ");
-        //    return catepAsync.ToList();
-        //}
+
+        public async Task<IEnumerable<Category>> GetCategoryAtProducts()
+        {
+            using var connection = _dataBase.CreateConnection();
+            var catepAsync = await connection.QueryAsync<Category>("select * from Categories c,Products p where p.CategoryId=c.Id ");
+            return catepAsync.ToList();
+        }
+
+
+
+        public void test()
+        {
+            var product = _repositoryContext.Products.Find(1);
+            Console.WriteLine(product.Category.Id + " " + product.Category.Code);
+
+        }
 
 
         public bool Save()
@@ -81,6 +90,9 @@ namespace AccountManagement.Repository
             return nrOfRowsAffected > 0;
         }
 
-
+        public Product FindById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

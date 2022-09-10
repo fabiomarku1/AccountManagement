@@ -16,27 +16,27 @@ namespace AccountManagement.Repository
     public class CurrencyRepository : ICurrencyRepository
     {
         private readonly DapperDbContext _dataBase;
-        private readonly IMapper _mapper;
         private readonly RepositoryContext _repositoryContext;
 
-        public CurrencyRepository(DapperDbContext dataBase, IMapper mapper, RepositoryContext repositoryContext)
+        public CurrencyRepository(DapperDbContext dataBase, RepositoryContext repositoryContext)
         {
             _dataBase = dataBase;
-            _mapper = mapper;
             _repositoryContext = repositoryContext;
         }
 
 
         public bool Create(Currency entity)
         {
-           entity.DateCreated=DateTime.Now;
-           entity.Code=entity.Code.ToUpper();
+            entity.DateCreated = DateTime.Now;
+            entity.Code = entity.Code.ToUpper();
 
-           _repositoryContext.Currencies.Add(entity);
-           return Save();
+            _repositoryContext.Currencies.Add(entity);
+            return Save();
         }
         public bool Update(Currency entity)
         {
+            entity.DateModified = DateTime.Now;
+            entity.Code = entity.Code.ToUpper();
             _repositoryContext.Currencies.Update(entity);
             return Save();
         }
@@ -74,6 +74,11 @@ namespace AccountManagement.Repository
             return currency.Id;
         }
 
-
+        public Currency FindById(int id)
+        {
+            var currency = _repositoryContext.Currencies.FirstOrDefault(e => e.Id == id);
+            _repositoryContext.ChangeTracker.Clear();
+            return currency;
+        }
     }
 }

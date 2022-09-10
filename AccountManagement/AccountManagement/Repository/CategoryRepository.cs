@@ -15,11 +15,6 @@ namespace AccountManagement.Repository
         private readonly DapperDbContext _dataBase;
         private readonly RepositoryContext _repositoryContext;
 
-        public CategoryRepository()
-        {
-            
-        }
-
         public CategoryRepository(DapperDbContext dataBase, RepositoryContext repositoryContext)
         {
             _dataBase = dataBase;
@@ -43,6 +38,8 @@ namespace AccountManagement.Repository
 
         public bool Update(Category entity)
         {
+            entity.DateModified = DateTime.Now;
+            entity.Code = entity.Code.ToUpper();
             _repositoryContext.Categories.Update(entity);
             return Save();
         }
@@ -57,23 +54,6 @@ namespace AccountManagement.Repository
         {
             return _repositoryContext.Categories.ToList();
         }
-
-
-        public int GetCategoryId(CategoryViewModel request)
-        {
-            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Code == request.Code);
-            _repositoryContext.ChangeTracker.Clear();
-            if (category != null)
-                return category.Id;
-            return -1;
-        }
-
-        public Category GetCategory(int id)
-        {
-            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Id==id);
-            return category;
-        }
-
 
         public bool Save() //change return value to an error
         {
@@ -91,5 +71,10 @@ namespace AccountManagement.Repository
 
         }
 
+        public Category FindById(int id)
+        {
+            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Id == id);
+            return category;
+        }
     }
 }

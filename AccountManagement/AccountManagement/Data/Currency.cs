@@ -11,7 +11,7 @@ namespace AccountManagement.Data
         public string Description { get; set; }
         public decimal ExchangeRate { get; set; }
         public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; } = DateTime.Now;
+        public DateTime DateModified { get; set; }
 
     }
 }

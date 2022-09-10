@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using AccountManagement.Data.DTO;
 
 namespace AccountManagement.Controllers
 {
@@ -17,23 +18,20 @@ namespace AccountManagement.Controllers
 
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
 
-        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper, IConfiguration configuration)
+
+        public CategoryController(ICategoryRepository categoryRepository, IMapper mapper)
         {
             _categoryRepository = categoryRepository;
             _mapper = mapper;
-            _config = configuration;
         }
 
 
         [HttpPost("Create")]
-        public IActionResult Create(CategoryViewModel request)
+        public IActionResult Create(CategoryDto request)
         {
             var category = _mapper.Map<Category>(request);
             var succeed = _categoryRepository.Create(category);
-
-
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
@@ -46,23 +44,24 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(CategoryViewModel request)
+        [HttpDelete("Delete/{id}")]
+        public IActionResult Delete(int id)
         {
-            var category = _mapper.Map<Category>(request);
-            category.Id = _categoryRepository.GetCategoryId(request);
-
+            var category = _categoryRepository.FindById(id);
+            if (category == null) return NotFound($"Category with id={id} does NOT exist");
 
             var succeed = _categoryRepository.Delete(category);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
-        [HttpPut("Update")]
-        public IActionResult Update(CategoryViewModel request)
+        [HttpPut("Update/{id}")]
+        public IActionResult Update(int id, CategoryDto request)
         {
-            var category = _mapper.Map<Category>(request);
-            category.Id = _categoryRepository.GetCategoryId(request);
 
+            var category = _categoryRepository.FindById(id);
+            if (category == null) return NotFound($"Category with id={id} does NOT exist");
+
+            category = _mapper.Map(request, category);
             var succeed = _categoryRepository.Update(category);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }

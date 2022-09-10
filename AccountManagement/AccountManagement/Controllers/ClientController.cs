@@ -8,6 +8,8 @@ using AccountManagement.Data.Model;
 using AccountManagement.Repository.Validation;
 using AutoMapper;
 using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -25,13 +27,11 @@ namespace AccountManagement.Controllers
     {
         private readonly IClientRepository _clientRepository;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
 
-        public ClientController(IClientRepository clientRepository, IMapper mapper, IConfiguration configuration)
+        public ClientController(IClientRepository clientRepository, IMapper mapper)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;
-            _config = configuration;
         }
 
 
@@ -41,16 +41,15 @@ namespace AccountManagement.Controllers
         {
             var validation = new ClientRegisterValidation(request);
 
+
             if (!validation.ValidateFields())
-                return BadRequest("Input not correct");
-            //if validation wrong =>  exit/return error 
-            // no need to go to repository
+                return BadRequest(validation.GetErrors());
 
             var entity = _mapper.Map<Client>(request);
-
             validation.HashClient(entity);
 
             var succeed = _clientRepository.Create(entity);
+
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
@@ -63,75 +62,43 @@ namespace AccountManagement.Controllers
         }
 
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(ClientViewModel request)
+        [HttpDelete("Delete/{id}")]
+        public IActionResult Delete(int id)
         {
-            var client = _mapper.Map<Client>(request);
+            var client = _clientRepository.FindById(id);
 
-            client.Id = _clientRepository.GetClientId(request);
-
+            if (client == null)
+                return BadRequest($"Client with id={id} does not exist");
             var succeed = _clientRepository.Delete(client);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
-        //================================================================================================
-        [HttpPut("Update")]
-        public IActionResult Update(ClientRegistrationDto request)
+        [HttpPut("Update/{id}")]
+        public IActionResult Update(int id, [FromBody] ClientRegistrationDto request)
         {
+            var existingClient = _clientRepository.FindById(id);
+            if (existingClient == null)
+                return BadRequest($"Client with id={id} does not exists");
+
+
             var validation = new ClientRegisterValidation(request);
-
             if (!validation.ValidateFields())
-                return BadRequest("Input not correct");
+                return BadRequest(validation.GetErrors());
 
 
+            existingClient = _mapper.Map<ClientRegistrationDto, Client>(request, existingClient);
+            validation.HashClient(existingClient);
+            var succeed = _clientRepository.Update(existingClient);
 
-            var existingClient = _clientRepository.GetExistingClient(request);
-
-            var newClient = _mapper.Map<Client>(request);
-            newClient.Id = _clientRepository.GetClientId(request);
-
-
-
-            if (!validation.CheckForChanges(existingClient, newClient, request))//for the password / no need to hash it if its the same password
-                validation.HashClient(newClient); //else , hash the new password the mapped_client
-
-            var succeed = _clientRepository.Update(newClient);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
         }
-        //==================================================================================================
 
         [HttpGet("PrintDetailed")]
         public IActionResult FindAll()
         {
             return Ok(_clientRepository.FindAll());
-        }
-
-
-
-        [HttpPost("Login")]
-        public ActionResult<string> Login(ClientLogin input)
-        {
-            var validation = new ClientLoginValidation(input);
-
-            if (!validation.ValidateFields())
-                return BadRequest("failed at validation , create a list of error fields");
-
-
-
-            var dbClient = _clientRepository.GetExistingClient(input);
-
-            if (validation.ValidateLogin(dbClient))
-            {
-                var token = validation.GetToken(dbClient, _config);
-                return Ok(new { AccessToken = token });
-                //return token;
-            }
-            else
-            {
-                return Ok(new { Result = "Invalid login" });
-            }
-
         }
 
 

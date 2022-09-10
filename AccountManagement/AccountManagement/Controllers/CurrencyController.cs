@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
+using AccountManagement.Data.DTO;
 using Mapper = AccountManagement.Mapping.Mapper;
 
 namespace AccountManagement.Controllers
@@ -28,42 +29,43 @@ namespace AccountManagement.Controllers
         }
 
         [HttpPost("Create")]
-        public IActionResult Create(CurrencyViewModel request)
+        public IActionResult Create(CurrencyDto request)
         {
             var currency = _mapper.Map<Currency>(request);
-           var succeed= _currencyRepository.Create(currency);
-
+            var succeed = _currencyRepository.Create(currency);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
 
         [HttpGet("GetCurrencies")]
-        public async Task<IActionResult> GetClients()
+        public async Task<IActionResult> GetCurrencies()
         {
             var currencies = await _currencyRepository.GetCurrencies();
             return Ok(currencies);
         }
 
 
-        [HttpDelete("Delete")]
-        public IActionResult Delete(CurrencyViewModel request)
+        [HttpDelete("Delete/{id}")]
+        public IActionResult Delete(int id)
         {
-            var currency= _mapper.Map<Currency>(request);
-            currency.Id=_currencyRepository.GetCurrencyId(request);
-
-
-            var succeed=_currencyRepository.Delete(currency);
+            var currency = _currencyRepository.FindById(id);
+            var succeed = _currencyRepository.Delete(currency);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
-        [HttpPut("Update")]
-        public IActionResult Update(CurrencyViewModel request)
+        [HttpPut("Update/{id}")]
+        public IActionResult Update(int id, CurrencyDto request)
         {
-            var currency = _mapper.Map<Currency>(request);
-            currency.Id = _currencyRepository.GetCurrencyId(request);
+            var existingCurrency = _currencyRepository.FindById(id);
+            if (existingCurrency == null) return BadRequest($"Currency with id={id} does NOT exist ");
 
-            var succeed = _currencyRepository.Update(currency);
+
+
+            existingCurrency = _mapper.Map(request, existingCurrency);
+
+            var succeed = _currencyRepository.Update(existingCurrency);
+
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
 
         }

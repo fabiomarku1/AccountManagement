@@ -13,13 +13,17 @@ namespace AccountManagement.Mapping
             CreateMap<Client, ClientRegistrationDto>();
             CreateMap<Client, ClientViewModel>().ReverseMap();
             CreateMap<Client, ClientLogin>().ReverseMap();
+            CreateMap<Client, Client>();
 
 
-            CreateMap<Currency,CurrencyViewModel>().ReverseMap();
+            CreateMap<Currency, CurrencyViewModel>().ReverseMap();
+            CreateMap<Currency, CurrencyDto>().ReverseMap();
+            //   CreateMap<CurrencyDto, Currency>
 
             CreateMap<Category, CategoryViewModel>().ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
 
-            CreateMap<Product,ProductViewModel>().ReverseMap();
+            CreateMap<Product, ProductViewModel>().ReverseMap();
 
             //CreateMap<Client, ClientDto>().ReverseMap();
         }

@@ -10,6 +10,8 @@ namespace AccountManagement.Contracts
         public Task<IEnumerable<ProductViewModel>> GetProducts();
         public int GetProductId(ProductViewModel request);
 
-        public Task<IEnumerable<CategoryViewModel>> GetCategoryAtProducts();
+        public Task<IEnumerable<Category>> GetCategoryAtProducts();
+
+        public void test();
     }
 }
