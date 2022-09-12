@@ -2,9 +2,8 @@
 
 namespace AccountManagement.Data.DTO
 {
-    public class ProductCUDto
+    public class ProductCreateUpdateDto
     {
-        public IFormFile Image { get; set; }
         public string Name { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }

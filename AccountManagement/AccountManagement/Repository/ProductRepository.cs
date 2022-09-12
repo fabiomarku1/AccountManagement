@@ -29,13 +29,14 @@ namespace AccountManagement.Repository
         public bool Create(Product entity)
         {
             entity.DateCreated = DateTime.Now;
-
             _repositoryContext.Products.Add(entity);
             return Save();
         }
         public bool Update(Product entity)
         {
-            _repositoryContext.Products.Update(entity);
+            entity.DateModified=DateTime.Now;
+
+           _repositoryContext.Products.Update(entity);
             return Save();
         }
 
@@ -79,9 +80,5 @@ namespace AccountManagement.Repository
             return product;
         }
 
-        public int GetProductId(ProductViewModel request)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

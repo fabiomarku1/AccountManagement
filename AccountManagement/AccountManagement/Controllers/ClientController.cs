@@ -5,6 +5,7 @@ using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.Repository;
 using AccountManagement.Repository.Validation;
 using AutoMapper;
 using Dapper;
@@ -51,6 +52,15 @@ namespace AccountManagement.Controllers
             var succeed = _clientRepository.Create(entity);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+        }
+        
+        
+        [HttpGet("GetClient/{id}")] 
+        public IActionResult GetClient(int id)
+        {
+            var client = _clientRepository.FindById(id);
+            if (client == null) return NotFound("Product does NOT exist");
+            return Ok(client);
         }
 
 

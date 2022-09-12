@@ -9,8 +9,6 @@ namespace AccountManagement.Contracts
     public interface IProductRepository : IRepositoryBase<Product>
     {
         public Task<IEnumerable<ProductGDto>> GetProducts();
-        public int GetProductId(ProductViewModel request);
-
         public Task<IEnumerable<ProductCategoryDto>> GetProductsAndCategories();
     }
 }

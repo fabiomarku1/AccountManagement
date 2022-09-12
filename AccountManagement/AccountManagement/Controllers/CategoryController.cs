@@ -35,6 +35,13 @@ namespace AccountManagement.Controllers
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
+        [HttpGet("GetCategory/{id}")]
+        public IActionResult GetCategory(int id)
+        {
+            var category = _categoryRepository.FindById(id);
+            if (category == null) return NotFound("Product does NOT exist");
+            return Ok(category);
+        }
 
         [HttpGet("GetCategories")]
         public async Task<IActionResult> GetCategories()

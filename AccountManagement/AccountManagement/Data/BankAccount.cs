@@ -23,7 +23,7 @@ namespace AccountManagement.Data
 
      public bool IsActive { get; set; }
 
-     public DateTime DateCreated { get; set; }= DateTime.Now;
+     public DateTime DateCreated { get; set; }
      public DateTime? DateModified { get; set; } = null;
 
     }

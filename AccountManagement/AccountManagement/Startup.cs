@@ -49,7 +49,7 @@ namespace AccountManagement
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>(); 
             services.AddScoped<IProductRepository, ProductRepository>();
-          //  services.AddScoped<IClientRepository, ClientRepository>();
+            services.AddScoped<IBankAccountRepository, BankAccountRepository>();
             services.AddAutoMapper(typeof(Mapper));
         }
 

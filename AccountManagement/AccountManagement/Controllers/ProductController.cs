@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Net.WebRequestMethods;
 
 namespace AccountManagement.Controllers
 {
@@ -38,16 +39,15 @@ namespace AccountManagement.Controllers
 
 
         [HttpPost("Create")]
-        public IActionResult Create(ProductCUDto request)
+        public IActionResult Create(ProductCreateUpdateDto request)
         {
             var product = _mapper.Map<Product>(request);
-            product.Category = _categoryRepository.FindById(request.CategoryId);
 
-            using (var ms = new MemoryStream())
-            {
-                request.Image.CopyTo(ms);
-                var fileBytes = ms.ToArray();
-            }
+            var category = _categoryRepository.FindById(request.CategoryId);
+
+            if (category == null) return NotFound($"Category with id={request.CategoryId} does NOT exists");
+
+            product.Category = category;
 
             var succeed = _productRepository.Create(product);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
@@ -55,7 +55,7 @@ namespace AccountManagement.Controllers
 
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, [FromForm] ImageDto file, ProductCUDto request)
+        public IActionResult Update(int id, ProductCreateUpdateDto request)
         {
             var product = _productRepository.FindById(id);
             if (product == null) return NotFound("Product with id={id} does NOT exist");
@@ -81,15 +81,27 @@ namespace AccountManagement.Controllers
             {
                 image.Image.CopyTo(ms);
                 var fileBytes = ms.ToArray();
-
+                
                 if ((fileBytes.Length > 5e+6)) return BadRequest("Image size is to large , must be < 5mb ");
                 product.Image = fileBytes;
-
-
             }
 
             var succeed = _productRepository.Update(product);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+        }
+
+
+        [HttpGet("GetImage/{id}")]
+        public IActionResult GetImage(int id)
+        {
+            var product = _productRepository.FindById(id);
+
+            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+
+            if (product.Image == null) return NotFound("Image not found");
+
+            return File(product.Image, "image/png");
 
         }
 
@@ -111,14 +123,6 @@ namespace AccountManagement.Controllers
             return Ok(products);
         }
 
-        [HttpGet("PrintDetailed")]
-        public IActionResult FindAll()
-        {
-            //   _productRepository.test();
-            return Ok(_productRepository.FindAll());
-        }
-
-
         [HttpGet("GetProductsAndCategories")]
         public async Task<IActionResult> GetProductsCategories()
         {
@@ -126,12 +130,6 @@ namespace AccountManagement.Controllers
             return Ok(products);
         }
 
-
-        //[HttpGet("{id}")]
-        //public Task<ActionResult<List<Product>>> GetCategoriesAtProducts(int id)
-        //{
-        //    var product=_productRepository.
-        //}
 
 
     }

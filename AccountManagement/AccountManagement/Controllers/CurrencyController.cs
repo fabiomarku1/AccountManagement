@@ -37,6 +37,14 @@ namespace AccountManagement.Controllers
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
+        [HttpGet("GetCurrency/{id}")]
+        public IActionResult GetCurrency(int id)
+        {
+            var currency = _currencyRepository.FindById(id);
+            if (currency == null) return NotFound("Product does NOT exist");
+            return Ok(currency);
+        }
+
 
         [HttpGet("GetCurrencies")]
         public async Task<IActionResult> GetCurrencies()
