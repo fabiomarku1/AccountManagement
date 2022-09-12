@@ -24,6 +24,8 @@ namespace AccountManagement.Mapping
             CreateMap<Category, CategoryDto>().ReverseMap();
 
             CreateMap<Product, ProductViewModel>().ReverseMap();
+            CreateMap<Product, ProductCUDto>().ReverseMap();
+            CreateMap<Product, ProductGDto>().ReverseMap();
 
             //CreateMap<Client, ClientDto>().ReverseMap();
         }

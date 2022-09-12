@@ -5,6 +5,7 @@ using AccountManagement.Data.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AccountManagement.Data.DTO;
 using Dapper;
 
 namespace AccountManagement.Repository
@@ -50,37 +51,19 @@ namespace AccountManagement.Repository
             return _repositoryContext.Products.ToList();
         }
 
-        public async Task<IEnumerable<ProductViewModel>> GetProducts()
+        public async Task<IEnumerable<ProductGDto>> GetProducts()
         {
             using var connection = _dataBase.CreateConnection();
-            var product = await connection.QueryAsync<ProductViewModel>("select * from Products");
+            var product = await connection.QueryAsync<ProductGDto>("select * from Products");
             return product.ToList();
         }
 
-        public int GetProductId(ProductViewModel request)
-        {
-            var product = _repositoryContext.Products.FirstOrDefault(e => e.CategoryId == request.CategoryId);
-            _repositoryContext.ChangeTracker.Clear();
-            if (product != null)
-                return product.Id;
-            return -1;
-        }
 
-
-        public async Task<IEnumerable<Category>> GetCategoryAtProducts()
+        public async Task<IEnumerable<ProductCategoryDto>> GetProductsAndCategories()
         {
             using var connection = _dataBase.CreateConnection();
-            var catepAsync = await connection.QueryAsync<Category>("select * from Categories c,Products p where p.CategoryId=c.Id ");
+            var catepAsync = await connection.QueryAsync<ProductCategoryDto>("select p.Id AS ProductId,p.Name as ProductName,c.Id as CategoryId,c.Code as CategoryCode,C.Description as CategoryDescription from Categories c,Products p where p.CategoryId=c.Id ");
             return catepAsync.ToList();
-        }
-
-
-
-        public void test()
-        {
-            var product = _repositoryContext.Products.Find(1);
-            Console.WriteLine(product.Category.Id + " " + product.Category.Code);
-
         }
 
 
@@ -91,6 +74,12 @@ namespace AccountManagement.Repository
         }
 
         public Product FindById(int id)
+        {
+            var product = _repositoryContext.Products.Find(id);
+            return product;
+        }
+
+        public int GetProductId(ProductViewModel request)
         {
             throw new NotImplementedException();
         }

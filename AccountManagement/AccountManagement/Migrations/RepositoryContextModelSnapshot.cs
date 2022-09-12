@@ -4,16 +4,14 @@ using AccountManagement.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AccountManagement.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20220907205722_CurrnenyChanged")]
-    partial class CurrnenyChanged
+    partial class RepositoryContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -106,7 +104,7 @@ namespace AccountManagement.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DateModified")
+                    b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -202,6 +200,9 @@ namespace AccountManagement.Migrations
                     b.Property<DateTime>("DateModified")
                         .HasColumnType("datetime2");
 
+                    b.Property<byte[]>("Image")
+                        .HasColumnType("varbinary(max)");
+
                     b.Property<string>("LongDescription")
                         .HasColumnType("nvarchar(max)");
 
@@ -223,21 +224,21 @@ namespace AccountManagement.Migrations
 
             modelBuilder.Entity("AccountManagement.Data.BankAccount", b =>
                 {
-                    b.HasOne("AccountManagement.Data.Client", "RequestingClient")
+                    b.HasOne("AccountManagement.Data.Client", "Client")
                         .WithMany()
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AccountManagement.Data.Currency", "RequestingCurrency")
+                    b.HasOne("AccountManagement.Data.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RequestingClient");
+                    b.Navigation("Client");
 
-                    b.Navigation("RequestingCurrency");
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("AccountManagement.Data.BankTransaction", b =>
@@ -253,13 +254,13 @@ namespace AccountManagement.Migrations
 
             modelBuilder.Entity("AccountManagement.Data.Product", b =>
                 {
-                    b.HasOne("AccountManagement.Data.Category", "RequestingCategory")
+                    b.HasOne("AccountManagement.Data.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RequestingCategory");
+                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }
