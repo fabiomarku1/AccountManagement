@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccountManagement.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20220912085801_SomeMigration")]
-    partial class SomeMigration
+    [Migration("20220913082908_TestVirtual")]
+    partial class TestVirtual
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

@@ -76,8 +76,8 @@ namespace AccountManagement.Repository
 
         public Currency FindById(int id)
         {
-            var currency = _repositoryContext.Currencies.FirstOrDefault(e => e.Id == id);
-            _repositoryContext.ChangeTracker.Clear();
+            var currency = _repositoryContext.Currencies.Find(id);
+            //  _repositoryContext.ChangeTracker.Clear();
             return currency;
         }
     }

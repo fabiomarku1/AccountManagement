@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
+using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using Dapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace AccountManagement.Repository
@@ -28,10 +32,12 @@ namespace AccountManagement.Repository
 
         public bool Create(BankAccount entity)
         {
-            entity.Client = _clientRepository.FindById(entity.ClientId);
-            entity.Currency = _currencyRepository.FindById(entity.CurrencyId);
+            if (CodeUserLevelExists(entity)) return false; //do a list for errors here;
 
-            entity.DateCreated=DateTime.Now;
+            //entity.Client = _clientRepository.FindById(entity.ClientId);
+            //entity.Currency = _currencyRepository.FindById(entity.CurrencyId);
+
+            entity.DateCreated = DateTime.Now;
             _repositoryContext.BankAccounts.Add(entity);
             return Save();
 
@@ -43,11 +49,37 @@ namespace AccountManagement.Repository
             return _repositoryContext.BankAccounts.Find(id);
         }
 
+
         public bool Update(BankAccount entity)
         {
+            if (CodeUserLevelExists(entity)) return false; //do a list for errors here;
+
             entity.DateModified = DateTime.Now;
             _repositoryContext.BankAccounts.Update(entity);
             return Save();
+        }
+
+        public bool DeactivateAccount(BankAccount entity)
+        {
+            entity.DateModified = DateTime.Now;
+            entity.IsActive = false;
+
+            _repositoryContext.BankAccounts.Update(entity);
+            return Save();
+
+        }
+
+        public bool CodeUserLevelExists(BankAccount newAccount)
+        {
+            var code = newAccount.Code;
+
+            var listOfAccounts = AccountFromClientId(newAccount.ClientId);
+
+            foreach (var i in listOfAccounts)
+            {
+                if (i.Code.Equals(code)) return true;
+            }
+            return false;
         }
 
         public bool Delete(BankAccount entity)
@@ -79,6 +111,7 @@ namespace AccountManagement.Repository
 
 
 
+
         public bool CurrencyExists(int id)
         {
             var isValid = _currencyRepository.FindById(id);
@@ -91,6 +124,27 @@ namespace AccountManagement.Repository
             return isValid != null;
         }
 
+        public async Task<IEnumerable<BankAccountGetDto>> GetBankAccounts()
+        {
+            using var connection = _dataBase.CreateConnection();
+            var banks = await connection.QueryAsync<BankAccountGetDto>("select * from BankAccounts");
+            return banks.ToList();
+        }
 
+
+        public List<BankAccount> AccountFromClientId(int id)
+        {
+            using var connection = _dataBase.CreateConnection();
+            var banks = connection.Query<BankAccount>($"select * from BankAccounts where ClientId={id}").ToList();
+            return banks;
+        }
+
+
+        public async Task<BankAccountGetDto> GetBankAccount(int id)
+        {
+            using var connection = _dataBase.CreateConnection();
+            var banks = await connection.QueryAsync<BankAccountGetDto>($"select * from BankAccounts where Id={id}");
+            return banks.SingleOrDefault();
+        }
     }
 }

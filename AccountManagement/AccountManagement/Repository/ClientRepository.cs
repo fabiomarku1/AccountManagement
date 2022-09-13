@@ -49,11 +49,10 @@ namespace AccountManagement.Repository
             return Save();
         }
 
-        //  data is coming from DTO , so update based on unique keys that are
         public Client FindById(int id)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(x => x.Id == id);
-            _repositoryContext.ChangeTracker.Clear();
+            var client = _repositoryContext.Clients.Find(id);
+            //  _repositoryContext.ChangeTracker.Clear();
             return client;
         }
 
