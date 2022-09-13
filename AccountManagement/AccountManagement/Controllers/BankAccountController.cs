@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
@@ -19,6 +21,7 @@ namespace AccountManagement.Controllers
         private readonly IMapper _mapper;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IClientRepository _clientRepository;
+ 
 
         public BankAccountController(IMapper mapper, IBankAccountRepository bankAccountRepository, IClientRepository clientRepository, ICurrencyRepository currencyRepository)
         {
@@ -43,16 +46,18 @@ namespace AccountManagement.Controllers
             bankAccount.Currency = currency;
             bankAccount.Client = client;
 
+            try
+            {
+                var succeed = _bankAccountRepository.Create(bankAccount);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
 
-            //var isClientValid = _bankAccountRepository.ClientExists(request.ClientId);
-            //if (!isClientValid) return Ok("Client does NOT exists");
+            }
+            catch (ArgumentException e)
+            {
+                return Ok(e.Message);
+            }
 
-            //var isCurrencyValid = _bankAccountRepository.CurrencyExists(request.CurrencyId);
-            //if (!isCurrencyValid) return Ok("Currency does NOT exists");
-
-            var succeed = _bankAccountRepository.Create(bankAccount);
-
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+         
         }
 
         [HttpGet("GetBankAccount/{id}")]
@@ -86,9 +91,15 @@ namespace AccountManagement.Controllers
 
             bank = _mapper.Map(request, bank);
 
-            var succeed = _bankAccountRepository.Update(bank);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-
+            try
+            {
+             var succeed = _bankAccountRepository.Update(bank);
+              return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException e)
+            {
+                return Ok(e.Message);
+            }
         }
 
 
@@ -103,7 +114,9 @@ namespace AccountManagement.Controllers
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         } //===============================DELETED IT AT THE END , NO NEED================
 
-        //===============================DELETED IT AT THE END , NO NEED================
+
+
+
         [HttpPut("DeactivateAccount/{id}")]
         public IActionResult DeactivateAccount(int id)
         {

@@ -16,5 +16,6 @@ namespace AccountManagement.Contracts
         public Task<BankAccountGetDto> GetBankAccount(int id);
 
         public List<BankAccount> AccountFromClientId(int id);
+
     }
 }

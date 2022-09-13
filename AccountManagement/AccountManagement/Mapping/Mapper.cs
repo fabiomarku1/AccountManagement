@@ -33,6 +33,11 @@ namespace AccountManagement.Mapping
             CreateMap<BankAccount, BankAccountGetDto>().ReverseMap();
 
 
+            CreateMap<BankTransaction, BankTransactionCreateDto>().ReverseMap();
+            CreateMap<BankTransaction, BankTransactionGetDto>().ReverseMap();
+
+
+
             //CreateMap<Client, ClientDto>().ReverseMap();
         }
     }

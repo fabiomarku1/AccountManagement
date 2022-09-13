@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using AccountManagement.Repository;
 using AccountManagement.Data.Model;
 using AccountManagement.Mapping;
+using AccountManagement.Repository.Contracts;
 
 namespace AccountManagement
 {
@@ -44,13 +45,14 @@ namespace AccountManagement
 
             services.AddSingleton<DapperDbContext>();
 
-
             services.AddScoped<IClientRepository, ClientRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>(); 
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IBankAccountRepository, BankAccountRepository>();
-            services.AddAutoMapper(typeof(Mapper));
+            services.AddScoped<IBankTransactionRepository, BankTransactionRepository>();  
+
+       services.AddAutoMapper(typeof(Mapper));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

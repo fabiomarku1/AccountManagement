@@ -7,16 +7,15 @@ namespace AccountManagement.Data
     public class BankTransaction
     {
         [Key] public int Id { get; set; }
-
+        public virtual BankAccount BankAccount { get; set; }
+       
         [ForeignKey("BankAccountId")]
-        public BankAccount RequestingBankAccount { get; set; }
         public int BankAccountId { get; set; }
-        public decimal Amount { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime DateCreated { get; set; }= DateTime.Now;
-        public DateTime? DateModified { get; set; } = null;
         public ActionCall Action { get; set; }
-        
+        public decimal Amount { get; set; }
+        public bool IsActive { get; set; } = true;
+        public DateTime DateCreated { get; set; }
+        public DateTime? DateModified { get; set; }
     }
     public enum ActionCall
     {

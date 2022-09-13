@@ -20,7 +20,6 @@ namespace AccountManagement.Repository
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IClientRepository _clientRepository;
 
-
         public BankAccountRepository(DapperDbContext dataBase, RepositoryContext repositoryContext, ICurrencyRepository currencyRepository, IClientRepository clientRepository)
         {
             _dataBase = dataBase;
@@ -32,10 +31,7 @@ namespace AccountManagement.Repository
 
         public bool Create(BankAccount entity)
         {
-            if (CodeUserLevelExists(entity)) return false; //do a list for errors here;
-
-            //entity.Client = _clientRepository.FindById(entity.ClientId);
-            //entity.Currency = _currencyRepository.FindById(entity.CurrencyId);
+            if (CodeUserLevelExists(entity)) throw new ArgumentException("There is an existing CODE for this client");
 
             entity.DateCreated = DateTime.Now;
             _repositoryContext.BankAccounts.Add(entity);
@@ -46,13 +42,14 @@ namespace AccountManagement.Repository
 
         public BankAccount FindById(int id)
         {
-            return _repositoryContext.BankAccounts.Find(id);
+            var account= _repositoryContext.BankAccounts.Find(id);
+            return account;
         }
 
 
         public bool Update(BankAccount entity)
         {
-            if (CodeUserLevelExists(entity)) return false; //do a list for errors here;
+            if (CodeUserLevelExists(entity)) throw new ArgumentException("There is an existing CODE for this client");
 
             entity.DateModified = DateTime.Now;
             _repositoryContext.BankAccounts.Update(entity);
@@ -77,7 +74,7 @@ namespace AccountManagement.Repository
 
             foreach (var i in listOfAccounts)
             {
-                if (i.Code.Equals(code)) return true;
+                if (i.Code.Equals(code) && newAccount.Id!=i.Id ) return true;
             }
             return false;
         }
@@ -146,5 +143,6 @@ namespace AccountManagement.Repository
             var banks = await connection.QueryAsync<BankAccountGetDto>($"select * from BankAccounts where Id={id}");
             return banks.SingleOrDefault();
         }
+
     }
 }
