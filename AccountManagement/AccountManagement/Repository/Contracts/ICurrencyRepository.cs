@@ -9,7 +9,5 @@ namespace AccountManagement.Contracts
     {
         public Task<IEnumerable<CurrencyViewModel>> GetCurrencies();
 
-        public int GetCurrencyId(CurrencyViewModel request);
-
     }
 }

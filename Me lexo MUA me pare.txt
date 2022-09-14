@@ -1,0 +1,156 @@
+Hello there, 
+Ketu po bej nje brief explanation te projektit .
+Struktura e projektit eshte ndryshuar disa here , ne varesi te njohurive te marra gjate rrugetimit :D  , po ashtu edhe nga pjesa e feedback-ut.
+(Mund ti shikoni edhe tek commits tek githubi(https://github.com/fabiomarku1/AccountManagement)
+
+
+Thank you in advance.
+
+
+
+IT AINT MUCH , BUT ITS HONEST WORK :D :D 
+
+May look a litle complicated, but i can explain it...........
+
+
+
+
+CLIENT=======================CLIENT====================CLIENT
+
+
+CLIENT ka 1 entitet te sajen sikur eshte kerkuar ne dokumentin dhe qe ruhet tek dbo , po ashtu kam krijuar 3DTO(2+1MV) per kete entitet
+Ne momentin qe plotesohen fileds per CREATE , kam bere nje klase per validimin e ktyre fields .
+(ClientRegistrationValidation) qe merr si parameter DTO per krijim e clientit , edhe i ben valid ku:
+emri+mbiemri -> shikon nqs ka space ne fillim dhe ne fund
+username -> lejohet vetem pike edhe undersore   .  _ 
+email -> shikohet per valid email  @,.Com etc.
+passord -> validim siq eshte e kerkuar tek dokumentacioni i projektit . 
+
+te gjitha kto jane te bere me REGEX , dhe me nje if condition secila , qe nqs kemi nje mosvalid i ruajm ne nje LIST 
+dhe ia dergojm frontit qe te shikoje se cfare fieldi ka gabim.
+
+Po ashtu tek kjo klase eshte dhe pjesa e hashimit te passwordit dhe verifikimit te tij .
+
+Tek ClientRepository kam krijuar disa metoda private qe bejne pjesen e validim per usernmae phone dhe email qe te mos kete duplicate , kjo mund te behet
+EDHE duke bere catch te controlleri exeption e saveChanges() qe ben throw per duplicate , edhe e paraqesim error tek fronti . POR....... duker perdorur metodat
+ne momentin qe po bejme CREATE ose UPDATE , bejme query per secilin field USERNAME EMAIL DHE PHONE qe te shikojm nqs ndodhen ne dbo , dhe nga ktu bejme 
+THROW ARGUMENTEXP per secilit qe mund te bejme throw qe dhe fronti/useri ta dij se ku eshte errori tek CREATE/UPDATE.
+
+
+A LITTLE COMPLICATED , BUT WORKS............
+
+CLIENT=======================CLIENT====================CLIENT
+
+
+
+
+
+
+
+
+
+LOGIN===========================LOGIN=========================LOGIN
+Tek pjesa e loginit , ktu passwordi hashohet ne Salt dhe Hash (arrays of bytes)  nga nje klase e krijuar qe quhet ClientLoginValidation , 
+ku si parameter merr nje entitet CLIENT dhe me pas ben check per USERNAME PASSWORD, nqs usernami eshte ne dbo ose jo ,
+ if true => krahaso hashin dhe saltin e atij clienti qe gjenden ne dbo ME kete  clientin qe morem si parameter.
+
+Tek Controlleri , si fillim beje check username te mos kete spaces ne fillim ose ne fund me regex , pastaj ne varesi te succesful login , kthejm nje token
+qe ka si claims id , email , dhe name ) dhe skadon per 30min  ( DUKE PERDOR JWT LIBRABY ).
+LOGIN===========================LOGIN=========================LOGIN
+
+
+
+
+
+
+
+CURRENCY======================CURRENCY====================CURRENCY
+
+Currency ka entitetin e saj siq eshte kerkuar tek dokumentimi , ka dhe 2 DTO class te tjera (1 modelview) per pjesen e crud-t qe perdoren keto dto.
+Logic eshte e njejte sikur entitet e tjera, por tek repositori i ksaj ne momentin qe bejme create/update bejme ruajten ne UPPERCASE te code te currenys
+dhe po ashtu bejme nje query te shikojme per duplicate te CODE dhe bejme throw exception qe exists , dhe i bejme catch tek COntrolleri.
+
+CURRENCY======================CURRENCY====================CURRENCY
+
+
+
+
+
+CATEGORY=====================CATEGORY========================CATEGORY
+
+Category has the same principles as currency .
+
+CATEGORY=====================CATEGORY========================CATEGORY
+
+
+
+
+
+PRODUCT=======================PRODUCT=====================PRODUCT
+
+Product-i ka 1 entitet te saj me te dhenat perkatese sic eshte tek dokumentimi , dhe po ashtu kam krijuar 4-classes DTO per produktin(3dto dhe 1Model.....A LOT , I KNOW) .
+
+Kur krijojme nje record te ri per Product , nuk kemi se si ti ruhemi duplikimit per te , sepse 1 product (eg. BOOKS ) mund te kene emera te njejte edhe 
+qe e kam lene te mos e verifikoj per duplicates . ( MIRE DO ISHTE TE SHIKOHEJ , but still....).
+
+CREATE dhe UPDATE kane nje DTO class te perbashket , pra ato field qe do shkruaj per te krijuar nje prod te ri , po ato fields do
+te shkruaj qe te beje UPDATE.
+
+Kam krijuar 2 API per pjesen e IMAZHIT , nje per ti bere insert ku si parameter duhet ID e productit , edhe pjesa e save
+behet ne array of bytes  ( byte[]) , dhe nje per ta marr imazhin nga dbo ( tek controlleri qe do beje get imazhin , i
+ben thejsht return File(product.image)  [kjo ishte nje solution per mua] .
+
+
+Po ashtu eshte nje API tjt qe ben show te GJITHA product bashk me disa te dhena te PRODUKTIT DHE THE KATEGORIS bashk.//may be delete... made it just for fun
+PRODUCT=======================PRODUCT=====================PRODUCT
+
+
+
+
+BankAccount================================BankAccount======================BankAccount
+BankACcount ka entitetin perkatese sic eshte tek dokumentimi, dhe kam krijuar 3-DTO te tjera per pjesen e CRUD .
+Tek Repositori i ktij , kam deklaruar edhe 2 repository te tjera Currency dhe Client .(duke ditur qe jane 1-to-many ne relationship me ato te dyja , i
+bie qe te kemi foreign keys tek bankacount) . 
+
+Tek INTERFACE-i i repositorit kam krijuar disa metoda te tjera , psh per pjesen e GET, SOFTDELETE per acc , edhe 2 metoda per pjesen validimit te code 
+ne nivel clienti.
+
+Tek repostiory , ne momentin qe bejme CREATE ose UPDATE , fillimisht bejme check nqs ky Account qe kemi si request ka ndonje user me po te njejtin bankCode,
+nqs ka,throw argexp dhe handle behet tek controlleri . 
+
+
+Kur bejme SOFT DELETE , kemi nje method qe ben isACtine ne false te requestit te dhene si parameter , pra qe e ben accoutin passiv .
+
+
+
+TEK CONTROLLERI , ne momentin qe bejme CREATE ose UPDATE , fillimisht bejme check nqs PRIMARY KEYS (ClientID,CurrencyID) jane valid duker therritur
+ metodat perkatese . if ok -> inicializo objektet e BankAccount me te Client dhe Currency perkates sipas ID-s se marre , else return not found perkates.
+BankAccount================================BankAccount======================BankAccount
+
+
+
+
+
+
+
+BankTransaction=======================BankTransaction====================BankTransaction
+
+Tek BankTransaction ne momentin qe bejme CREATE trans , fillimisht duhet te bejme check nqs BankAccount exists me id qe kemi marr si parameter .
+
+Po ashtu duhet te bejme check tek pjesa e ACTIONCALL e cila eshte ENUM type , SQL SERVER nuk ben create enum ne database (MySQl ben) , kshuqe ActionCAll
+e kam ruajtun si INT ne dabase , pra qe merr cdo int si parameter .KTu bejme nje check nqs eshte 1 per Deposit dhe 2 per Withdrawal , else throw argument
+execption qe actioncall nuk eshte valid. Edhe bazuar ne ACtionCall qe kemi , kemi nje Metode DOAction qe ben Withdrawal ose DEposit ne varesi te thirrjes.
+
+
+BankTransaction=======================BankTransaction====================BankTransaction
+
+
+
+
+
+public bool Save()   ( Nje menyre per handling exceptions)
+-> ne momentin qe bejme save nje record ne database , kty mund te bejme handle exepction per duplikim te te dhenave . 
+Pra ne momentin qe kemi dublicate do na throw execption edhe i bejme handle tek CONTROLERI perkates.
+
+
+

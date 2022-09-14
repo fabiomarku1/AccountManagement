@@ -14,7 +14,6 @@ namespace AccountManagement.Contracts
         public bool CodeUserLevelExists(BankAccount entity);
         public Task<IEnumerable<BankAccountGetDto>> GetBankAccounts();
         public Task<BankAccountGetDto> GetBankAccount(int id);
-
         public List<BankAccount> AccountFromClientId(int id);
 
     }

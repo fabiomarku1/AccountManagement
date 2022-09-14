@@ -56,8 +56,12 @@ namespace AccountManagement.Controllers
             {
                 return Ok(e.Message);
             }
+            catch (Exception e)
+            {
+                return Ok(e.Message);
+            }
 
-         
+
         }
 
         [HttpGet("GetBankAccount/{id}")]
@@ -66,11 +70,7 @@ namespace AccountManagement.Controllers
 
             var bank = _bankAccountRepository.FindById(id);
             if (bank == null) return NotFound("Bank Account does NOT exists");
-            //
-            //   var mappedBank = _mapper.Map<BankAccountGetDto>(bank);
-
-            //  var mapped = _mapper.Map(bank, mappedBank);
-
+            
             var bans = await _bankAccountRepository.GetBankAccount(id);
             return Ok(bans);
 
@@ -97,6 +97,10 @@ namespace AccountManagement.Controllers
               return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
             }
             catch (ArgumentException e)
+            {
+                return Ok(e.Message);
+            }
+            catch (Exception e)
             {
                 return Ok(e.Message);
             }

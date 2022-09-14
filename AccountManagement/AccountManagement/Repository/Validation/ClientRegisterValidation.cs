@@ -15,7 +15,7 @@ namespace AccountManagement.Repository.Validation
     {
 
         private readonly ClientRegistrationDto _clientRegistration;
-        private readonly List<string> errorList = new List<string>();
+        private readonly List<string> _errorList = new List<string>();
 
         public ClientRegisterValidation(ClientRegistrationDto clientRegistration)
         {
@@ -26,36 +26,36 @@ namespace AccountManagement.Repository.Validation
         public bool ValidateFields()
         {
             if (!Regex.IsMatch(_clientRegistration.FirstName, "^\\S+$"))
-                errorList.Add("FirstName not valid(check whitespaces)");
+                _errorList.Add("FirstName not valid(check whitespaces)");
 
             if (!Regex.IsMatch(_clientRegistration.LastName, "^\\S+$"))
-                errorList.Add("LastName not valid(check whitespaces)");
+                _errorList.Add("LastName not valid(check whitespaces)");
 
             if (!Regex.IsMatch(_clientRegistration.Username,
                    @"^(?=.{5,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$"))
-                errorList.Add("Username not valid(check whitespaces and special Characters: {. _} ) ");
+                _errorList.Add("Username not valid(check whitespaces and special Characters: {. _} ) ");
 
             if (!Regex.IsMatch(_clientRegistration.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
-                errorList.Add("Email not valid");
+                _errorList.Add("Email not valid");
 
 
             if (!Regex.IsMatch(_clientRegistration.Password,
                 @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"))
-                errorList.Add("Password not valid. Must contain : A lowercase letter " +
-                              ",A uppercase letter , " +
-                              "A special character," +
-                              "8 characters long ");
+                _errorList.Add("Password not valid. Must contain : A lowercase letter " +
+                               ",A uppercase letter , " +
+                               "A special character," +
+                               "8 characters long ");
 
             if (!Regex.IsMatch(_clientRegistration.Phone, @"^\+?[0-9][0-9]{7,12}$"))
-                errorList.Add("Phone number not valid (check prefix ex:+355 ," +
-                              "Must be between 7-12 digit ");
+                _errorList.Add("Phone number not valid (check prefix ex:+355 ," +
+                               "Must be between 7-12 digit ");
 
-            return errorList.Capacity <= 0;
+            return _errorList.Capacity <= 0;
 
         }//create a dictinary for the error output
 
 
-        public List<string> GetErrors() => errorList;
+        public List<string> GetErrors() => _errorList;
 
         public void HashClient(Client client) //for an update , this is going to be called , edhe pse do therritet kot 
         {
@@ -71,19 +71,6 @@ namespace AccountManagement.Repository.Validation
                 passwordSalt = crypto.Key;
                 passwordHash = crypto.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
-        }
-
-
-        public bool CheckForChanges(Client request, Client newClient, ClientRegistrationDto loginRequest)
-        {
-            if (VerifyPassword(loginRequest.Password, request.PasswordHash, request.PasswordSalt))
-            {
-                newClient.PasswordHash = request.PasswordHash;
-                newClient.PasswordSalt = request.PasswordSalt;
-                return true;
-            }
-
-            return false;
         }
 
 

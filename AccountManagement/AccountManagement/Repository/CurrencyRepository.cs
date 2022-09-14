@@ -27,6 +27,8 @@ namespace AccountManagement.Repository
 
         public bool Create(Currency entity)
         {
+            if (DoesExist(entity)) throw new ArgumentException($"Currency with code {entity.Code} already exists");
+
             entity.DateCreated = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
 
@@ -35,6 +37,9 @@ namespace AccountManagement.Repository
         }
         public bool Update(Currency entity)
         {
+            if (DoesExistUpdate(entity) ) throw new ArgumentException($"Currency with code {entity.Code} already exists");
+
+
             entity.DateModified = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
             _repositoryContext.Currencies.Update(entity);
@@ -53,7 +58,7 @@ namespace AccountManagement.Repository
         }
 
 
-        public bool Save() //throw expection here for DUPLICATE UNIQUE data
+        public bool Save() 
         {
             var numberRowsAffected = _repositoryContext.SaveChanges();
             return numberRowsAffected > 0;
@@ -66,19 +71,24 @@ namespace AccountManagement.Repository
             return currency.ToList();
         }
 
-
-        public int GetCurrencyId(CurrencyViewModel request)
-        {
-            var currency = _repositoryContext.Currencies.FirstOrDefault(e => e.Code == request.Code);
-            _repositoryContext.ChangeTracker.Clear();
-            return currency.Id;
-        }
-
         public Currency FindById(int id)
         {
             var currency = _repositoryContext.Currencies.Find(id);
             //  _repositoryContext.ChangeTracker.Clear();
             return currency;
+        }
+
+        private bool DoesExist(Currency request)
+        {
+            var currency= _repositoryContext.Currencies.FirstOrDefault(e => e.Code == request.Code);
+            return currency != null;
+        }
+
+        private bool DoesExistUpdate(Currency request)
+        {
+            var currency = _repositoryContext.Currencies.FirstOrDefault(e => e.Code == request.Code);
+
+            return currency != null && (request.Id != currency.Id);
         }
     }
 }

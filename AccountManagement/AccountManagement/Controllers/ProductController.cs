@@ -23,15 +23,12 @@ namespace AccountManagement.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
         private readonly ICategoryRepository _categoryRepository;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper, IConfiguration configuration,
-            ICategoryRepository categoryRepository)
+        public ProductController(IProductRepository productRepository, IMapper mapper ,ICategoryRepository categoryRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
-            _config = configuration;
             _categoryRepository = categoryRepository;
         }
 
@@ -70,7 +67,9 @@ namespace AccountManagement.Controllers
         {
             var product = _productRepository.FindById(id);
             if (product == null) return NotFound("Product does NOT exist");
-            return Ok(product);
+            
+            var mapped = _mapper.Map<ProductGDto>(product);
+            return Ok(mapped);
         }
 
         [HttpPut("InsertImage/{id}")]

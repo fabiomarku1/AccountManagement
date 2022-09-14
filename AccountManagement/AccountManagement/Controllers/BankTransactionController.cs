@@ -34,8 +34,6 @@ namespace AccountManagement.Controllers
         {
             var bankTransaction = _mapper.Map<BankTransaction>(request);
 
-
-
             bankTransaction.BankAccount = _bankAccountRepository.FindById(request.BankAccountId);
             if (bankTransaction.BankAccount == null) return NotFound("Bank account does NOT exists");
 

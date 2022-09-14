@@ -1,4 +1,5 @@
-﻿using AccountManagement.Contracts;
+﻿using System;
+using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.Model;
 using AccountManagement.Mapping;
@@ -19,29 +20,35 @@ namespace AccountManagement.Controllers
     {
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IMapper _mapper;
-        private readonly IConfiguration _config;
 
-        public CurrencyController(ICurrencyRepository currencyRepository, IMapper mapper, IConfiguration configuration)
+        public CurrencyController(ICurrencyRepository currencyRepository, IMapper mapper)
         {
             _currencyRepository = currencyRepository;
             _mapper = mapper;
-            _config = configuration;
         }
 
         [HttpPost("Create")]
         public IActionResult Create(CurrencyDto request)
         {
             var currency = _mapper.Map<Currency>(request);
-            var succeed = _currencyRepository.Create(currency);
 
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            try
+            {
+                var succeed = _currencyRepository.Create(currency);
+
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("GetCurrency/{id}")]
         public IActionResult GetCurrency(int id)
         {
             var currency = _currencyRepository.FindById(id);
-            if (currency == null) return NotFound("Product does NOT exist");
+            if (currency == null) return NotFound("Currency does NOT exist");
             return Ok(currency);
         }
 
@@ -66,23 +73,29 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, CurrencyDto request)
         {
             var existingCurrency = _currencyRepository.FindById(id);
-            if (existingCurrency == null) return BadRequest($"Currency with id={id} does NOT exist ");
-
-
+            if (existingCurrency == null) return NotFound($"Currency with id={id} does NOT exist ");
 
             existingCurrency = _mapper.Map(request, existingCurrency);
 
-            var succeed = _currencyRepository.Update(existingCurrency);
-
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            try
+            {
+                var succeed = _currencyRepository.Update(existingCurrency);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
         }
 
+
+        //====================================MAY BE DELETED============================
         [HttpGet("PrintDetailed")]
         public IActionResult FindAll()
         {
             return Ok(_currencyRepository.FindAll());
-        }
+        } //====================================MAY BE DELETED============================
 
 
     }

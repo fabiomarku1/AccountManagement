@@ -1,4 +1,5 @@
-﻿using AccountManagement.Contracts;
+﻿using System;
+using AccountManagement.Contracts;
 using AccountManagement.Data.Model;
 using AccountManagement.Data;
 using AccountManagement.Repository;
@@ -11,7 +12,7 @@ using AccountManagement.Data.DTO;
 
 namespace AccountManagement.Controllers
 {
-    [Route("api/category")]
+    [Route("api/Category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -31,15 +32,29 @@ namespace AccountManagement.Controllers
         public IActionResult Create(CategoryDto request)
         {
             var category = _mapper.Map<Category>(request);
-            var succeed = _categoryRepository.Create(category);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+
+            try
+            {
+                var succeed = _categoryRepository.Create(category);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
         [HttpGet("GetCategory/{id}")]
         public IActionResult GetCategory(int id)
         {
             var category = _categoryRepository.FindById(id);
-            if (category == null) return NotFound("Product does NOT exist");
+            if (category == null) return NotFound("Category does NOT exist");
             return Ok(category);
         }
 
@@ -69,8 +84,19 @@ namespace AccountManagement.Controllers
             if (category == null) return NotFound($"Category with id={id} does NOT exist");
 
             category = _mapper.Map(request, category);
-            var succeed = _categoryRepository.Update(category);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            try
+            {
+                var succeed = _categoryRepository.Update(category);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("PrintDetailed")]

@@ -14,6 +14,7 @@ using AccountManagement.Data.Model;
 using AccountManagement.Repository.Validation;
 using AutoMapper;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace AccountManagement.Repository
@@ -43,6 +44,9 @@ namespace AccountManagement.Repository
 
         public bool Create(Client entity)
         {
+            DoesExists(entity);
+
+
             entity.DateCreated = DateTime.Now;
 
             _repositoryContext.Clients.Add(entity);
@@ -86,36 +90,33 @@ namespace AccountManagement.Repository
 
         public bool Save()
         {
-            try
-            {
-                var changes = _repositoryContext.SaveChanges();
-                return changes > 0;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "error while writing changes to db");
-                return false;
-
-            }
-
+            var changes = _repositoryContext.SaveChanges(); 
+            return changes > 0;
         }
 
-        public int GetClientId(ClientRegistrationDto request)
+
+
+        private void DoesExists(Client request)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email);//email si me priority , user can change all filed, expect email
-            _repositoryContext.ChangeTracker.Clear();
-            if (client != null)
-                return client.Id;
-            return -1;
+            if (EmailDoesExists(request)) throw new ArgumentException("This EMAIL exists, try another one");
+            if (PhoneDoesExists(request)) throw new ArgumentException("This PHONE NUMBER exists, try another one");
+            if (UsernameDoesExists(request)) throw new ArgumentException("This USERNAME exists, try another one");
         }
 
-        public int GetClientId(ClientViewModel request)
+        private bool UsernameDoesExists(Client request)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email && e.Phone == request.Phone); //both unique
-            _repositoryContext.ChangeTracker.Clear();
-            if (client != null)
-                return client.Id;
-            return -1;
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Username == request.Username);
+            return client!=null;
+        }
+        private bool EmailDoesExists(Client request)
+        {
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email );
+            return client != null;
+        }
+        private bool PhoneDoesExists(Client request)
+        {
+            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Phone==request.Phone);
+            return client != null;
         }
     }
 

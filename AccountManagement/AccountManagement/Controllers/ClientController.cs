@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
@@ -49,12 +51,24 @@ namespace AccountManagement.Controllers
             var entity = _mapper.Map<Client>(request);
             validation.HashClient(entity);
 
-            var succeed = _clientRepository.Create(entity);
+            try
+            {
+                var succeed = _clientRepository.Create(entity);
 
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
-        
-        
+
+
+
         [HttpGet("GetClient/{id}")] 
         public IActionResult GetClient(int id)
         {
@@ -88,20 +102,31 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, [FromBody] ClientRegistrationDto request)
         {
             var existingClient = _clientRepository.FindById(id);
-            if (existingClient == null)
-                return BadRequest($"Client with id={id} does not exists");
+            if (existingClient == null) return BadRequest($"Client with id={id} does not exists");
 
 
             var validation = new ClientRegisterValidation(request);
-            if (!validation.ValidateFields())
-                return BadRequest(validation.GetErrors());
+            if (!validation.ValidateFields())  return BadRequest(validation.GetErrors());
 
 
             existingClient = _mapper.Map<ClientRegistrationDto, Client>(request, existingClient);
             validation.HashClient(existingClient);
-            var succeed = _clientRepository.Update(existingClient);
 
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            try
+            {
+                var succeed = _clientRepository.Update(existingClient);
+
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+           
 
         }
 

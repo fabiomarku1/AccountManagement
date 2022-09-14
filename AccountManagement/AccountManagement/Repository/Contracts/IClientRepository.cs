@@ -14,10 +14,7 @@ namespace AccountManagement.Contracts
     {
         public Task<IEnumerable<ClientViewModel>> GetClients();
 
-        // public Client GetExistingClient(Client entity);
         public Client GetExistingClient(ClientLogin entity);
 
-        //  public ICollection<ClientViewModel> FindAllModelClients();
-        /**/
     }
 }

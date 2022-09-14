@@ -24,11 +24,19 @@ namespace AccountManagement.Repository
 
         public bool Create(Category entity)
         {
+            if (DoesExist(entity)) throw new ArgumentException($"Category with code {entity.Code} already exists");
+
             entity.DateCreated = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
             _repositoryContext.Categories.Add(entity);
             return Save();
         }
+        public Category FindById(int id)
+        {
+            var category = _repositoryContext.Categories.Find(id);
+            return category;
+        }
+
         public async Task<IEnumerable<CategoryViewModel>> GetCategories()
         {
             using var connection = _dataBase.CreateConnection();
@@ -38,6 +46,8 @@ namespace AccountManagement.Repository
 
         public bool Update(Category entity)
         {
+            if (DoesExistUpdate(entity)) throw new ArgumentException($"Category with code {entity.Code} already exists");
+
             entity.DateModified = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
             _repositoryContext.Categories.Update(entity);
@@ -71,10 +81,17 @@ namespace AccountManagement.Repository
 
         }
 
-        public Category FindById(int id)
+        private bool DoesExist(Category request)
         {
-            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Id == id);
-            return category;
+            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Code == request.Code);
+            return category != null;
+        }
+
+        private bool DoesExistUpdate(Category request)
+        {
+            var category = _repositoryContext.Categories.FirstOrDefault(e => e.Code == request.Code);
+
+            return category != null && (request.Id != category.Id);
         }
     }
 }
