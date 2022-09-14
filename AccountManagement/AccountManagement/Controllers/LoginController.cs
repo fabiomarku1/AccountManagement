@@ -1,4 +1,5 @@
-﻿using AccountManagement.Contracts;
+﻿using System.ComponentModel;
+using AccountManagement.Contracts;
 using AccountManagement.Data.DTO;
 using AccountManagement.Repository.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -20,14 +21,14 @@ namespace AccountManagement.Controllers
 
 
 
-
+       
         [HttpPost("Login")]
         public ActionResult<string> Login(ClientLogin input)
         {
             var validation = new ClientLoginValidation(input);
 
             if (!validation.ValidateFields())
-                return BadRequest("Username not valid , check whitespaces");
+                return NotFound("Username not valid , check whitespaces");
 
 
 
@@ -41,7 +42,7 @@ namespace AccountManagement.Controllers
             }
             else
             {
-                return Ok(new { Result = "Invalid login,check username or password" });
+                return NotFound( "Invalid login,check username or password" );
             }
 
         }

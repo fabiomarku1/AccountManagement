@@ -1,4 +1,6 @@
-﻿namespace AccountManagement.Data.DTO
+﻿using System.ComponentModel;
+
+namespace AccountManagement.Data.DTO
 {
     public class ClientLogin
     {

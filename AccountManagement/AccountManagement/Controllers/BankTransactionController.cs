@@ -15,60 +15,60 @@ namespace AccountManagement.Controllers
     public class BankTransactionController : ControllerBase
     {
         private readonly IBankTransactionRepository _bankTransactionRepository;
-            private readonly IBankAccountRepository _bankAccountRepository;
-            private readonly IMapper _mapper;
-    
+        private readonly IBankAccountRepository _bankAccountRepository;
+        private readonly IMapper _mapper;
 
 
-            public BankTransactionController(IMapper mapper, IBankAccountRepository bankAccountRepository, IBankTransactionRepository bankTransactionRepository)
+
+        public BankTransactionController(IMapper mapper, IBankAccountRepository bankAccountRepository, IBankTransactionRepository bankTransactionRepository)
+        {
+            _mapper = mapper;
+            _bankAccountRepository = bankAccountRepository;
+            _bankTransactionRepository = bankTransactionRepository;
+        }
+
+
+
+        [HttpPost("Create")]
+        public IActionResult Create(BankTransactionCreateDto request)
+        {
+            var bankTransaction = _mapper.Map<BankTransaction>(request);
+
+
+
+            bankTransaction.BankAccount = _bankAccountRepository.FindById(request.BankAccountId);
+            if (bankTransaction.BankAccount == null) return NotFound("Bank account does NOT exists");
+
+            try
             {
-                _mapper = mapper;
-                _bankAccountRepository = bankAccountRepository;
-                _bankTransactionRepository = bankTransactionRepository;
-            }
-
-
-
-            [HttpPost("Create")]
-            public IActionResult Create(BankTransactionCreateDto request)
-            {
-                var bankTransaction = _mapper.Map<BankTransaction>(request);
-
-               
-
-                bankTransaction.BankAccount = _bankAccountRepository.FindById(request.BankAccountId);
-                if (bankTransaction.BankAccount == null) return NotFound("Bank account does NOT exists");
-
-                try
-                {
-                    var succeed = _bankTransactionRepository.Create(bankTransaction);
-                    return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-
-                }
-                catch (ArgumentException e)
-                {
-                    return Ok(e.Message);
-                }
+                var succeed = _bankTransactionRepository.Create(bankTransaction);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
 
             }
-
-
-            [HttpGet("GetTransaction/{id}")]
-            public IActionResult GetTransaction(int id)
+            catch (ArgumentException e)
             {
-                var transaction = _bankAccountRepository.FindById(id);
-                if (transaction == null) return NotFound("Bank Account does NOT exists");
-
-                return Ok(transaction);
+                return Ok(e.Message);
             }
 
+        }
 
-            [HttpGet("GetAllTransactions")]
-            public async Task<IActionResult> GetBankAccounts()
-            {
-                var banks = await _bankTransactionRepository.GetTransactions();
-                return Ok(banks);
-            }
+
+        [HttpGet("GetTransaction/{id}")]
+        public IActionResult GetTransaction(int id)
+        {
+            var transaction = _bankTransactionRepository.FindById(id);
+            if (transaction == null) return NotFound("Transaction not found");
+            var mappedTrans = _mapper.Map<BankTransactionGetDto>(transaction);
+            return Ok(mappedTrans);
+        }
+
+
+        [HttpGet("GetAllTransactions")]
+        public async Task<IActionResult> GetBankAccounts()
+        {
+            var banks = await _bankTransactionRepository.GetTransactions();
+            return Ok(banks);
+        }
 
     }
 
