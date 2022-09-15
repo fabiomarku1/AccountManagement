@@ -73,7 +73,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetClient(int id)
         {
             var client = _clientRepository.FindById(id);
-            if (client == null) return NotFound("Product does NOT exist");
+            if (client == null) return NotFound("Client does NOT exist");
             return Ok(client);
         }
 

@@ -31,7 +31,7 @@ namespace AccountManagement.Repository
 
         public bool Create(BankTransaction entity)
         {
-           DoAction(entity);
+            DoAction(entity);
 
             entity.BankAccount.DateModified = entity.DateCreated=DateTime.Now;
 
@@ -85,8 +85,14 @@ namespace AccountManagement.Repository
 
         private void DoAction(BankTransaction request)
         {
-            if (request.Action == ActionCall.Depositim) Deposit(request);
-            else if (request.Action == ActionCall.Terheqje) Withdrawal(request);
+            
+            if (request.Action == ActionCall.Depositim) 
+                Deposit(request);
+            else if (request.Action == ActionCall.Terheqje)
+            {
+                if (request.BankAccount.IsActive == false) throw new ArgumentException("The given bank account is not active.\nPlease ACTIVATE it in order to withdrawal");
+                Withdrawal(request);
+            }
             else throw new ArgumentException(" Not valid ACTION , 1-Depostim / 2-Terheqje");
 
         }
@@ -95,6 +101,7 @@ namespace AccountManagement.Repository
         private void Deposit(BankTransaction request)
         {
             request.BankAccount.Balance += request.Amount;
+          //  request.IsActive = true;
 
         }
 

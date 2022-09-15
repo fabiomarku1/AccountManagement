@@ -13,7 +13,7 @@ namespace AccountManagement.Data
         public int BankAccountId { get; set; }
         public ActionCall Action { get; set; }
         public decimal Amount { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } 
         public DateTime DateCreated { get; set; }
         public DateTime? DateModified { get; set; }
     }

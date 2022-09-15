@@ -11,6 +11,7 @@ namespace AccountManagement.Contracts
         public bool ClientExists(int id);
 
         public bool DeactivateAccount(BankAccount entity);
+        public bool ActivateAccount(BankAccount entity, decimal amount);
         public bool CodeUserLevelExists(BankAccount entity);
         public Task<IEnumerable<BankAccountGetDto>> GetBankAccounts();
         public Task<BankAccountGetDto> GetBankAccount(int id);

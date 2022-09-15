@@ -21,7 +21,7 @@ namespace AccountManagement.Controllers
         private readonly IMapper _mapper;
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IClientRepository _clientRepository;
- 
+
 
         public BankAccountController(IMapper mapper, IBankAccountRepository bankAccountRepository, IClientRepository clientRepository, ICurrencyRepository currencyRepository)
         {
@@ -70,7 +70,7 @@ namespace AccountManagement.Controllers
 
             var bank = _bankAccountRepository.FindById(id);
             if (bank == null) return NotFound("Bank Account does NOT exists");
-            
+
             var bans = await _bankAccountRepository.GetBankAccount(id);
             return Ok(bans);
 
@@ -93,8 +93,8 @@ namespace AccountManagement.Controllers
 
             try
             {
-             var succeed = _bankAccountRepository.Update(bank);
-              return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+                var succeed = _bankAccountRepository.Update(bank);
+                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
             }
             catch (ArgumentException e)
             {
@@ -127,7 +127,22 @@ namespace AccountManagement.Controllers
             var bank = _bankAccountRepository.FindById(id);
             if (bank == null) return NotFound("Bank Account does NOT exists");
 
+            if (bank.IsActive == false) return Conflict("This bank account is already in PASSIVE status");
+
             var succeed = _bankAccountRepository.DeactivateAccount(bank);
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+        }
+
+
+        [HttpPut("ActivateAccount/{id}")]
+        public IActionResult ActivateAccount(int id, decimal depositAmount)
+        {
+            var bank = _bankAccountRepository.FindById(id);
+            if (bank == null) return NotFound("Bank Account does NOT exists");
+
+            if (bank.IsActive == true) return Conflict("This bank account is already in ACTIVE status");
+
+            var succeed = _bankAccountRepository.ActivateAccount(bank, depositAmount);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 

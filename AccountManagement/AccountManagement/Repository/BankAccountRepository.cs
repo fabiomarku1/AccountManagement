@@ -42,7 +42,7 @@ namespace AccountManagement.Repository
 
         public BankAccount FindById(int id)
         {
-            var account= _repositoryContext.BankAccounts.Find(id);
+            var account = _repositoryContext.BankAccounts.Find(id);
             return account;
         }
 
@@ -66,6 +66,17 @@ namespace AccountManagement.Repository
 
         }
 
+        public bool ActivateAccount(BankAccount entity, decimal amount)
+        {
+            entity.DateModified = DateTime.Now;
+            entity.IsActive = true;
+            entity.Balance += amount;
+
+            _repositoryContext.BankAccounts.Update(entity);
+            return Save();
+
+        }
+
         public bool CodeUserLevelExists(BankAccount newAccount)
         {
             var code = newAccount.Code;
@@ -74,7 +85,7 @@ namespace AccountManagement.Repository
 
             foreach (var i in listOfAccounts)
             {
-                if (i.Code.Equals(code) && newAccount.Id!=i.Id ) return true;
+                if (i.Code.Equals(code) && newAccount.Id != i.Id) return true;
             }
             return false;
         }
@@ -105,7 +116,6 @@ namespace AccountManagement.Repository
 
             }
         }
-
 
 
 
