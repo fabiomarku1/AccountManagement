@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using AccountManagement.Contracts;
 using AccountManagement.Data.DTO;
 using AccountManagement.Repository.Validation;
@@ -21,7 +22,7 @@ namespace AccountManagement.Controllers
 
 
 
-       
+
         [HttpPost("Login")]
         public ActionResult<string> Login(ClientLogin input)
         {
@@ -42,7 +43,7 @@ namespace AccountManagement.Controllers
             }
             else
             {
-                return NotFound( "Invalid login,check username or password" );
+                return NotFound("Invalid login,check username or password");
             }
 
         }

@@ -44,7 +44,7 @@ namespace AccountManagement.Repository
 
         public bool Create(Client entity)
         {
-            DoesExists(entity);
+            DoesExists(entity, 1);
 
 
             entity.DateCreated = DateTime.Now;
@@ -62,6 +62,8 @@ namespace AccountManagement.Repository
 
         public bool Update(Client entity)
         {
+            DoesExists(entity, 2);
+
             entity.DateModified = DateTime.Now;
             _repositoryContext.Clients.Update(entity);
             return Save();
@@ -90,32 +92,65 @@ namespace AccountManagement.Repository
 
         public bool Save()
         {
-            var changes = _repositoryContext.SaveChanges(); 
+            var changes = _repositoryContext.SaveChanges();
             return changes > 0;
         }
 
 
 
-        private void DoesExists(Client request)
-        {
-            if (EmailDoesExists(request)) throw new ArgumentException("This EMAIL exists, try another one");
-            if (PhoneDoesExists(request)) throw new ArgumentException("This PHONE NUMBER exists, try another one");
-            if (UsernameDoesExists(request)) throw new ArgumentException("This USERNAME exists, try another one");
+        private void DoesExists(Client request, int selectSwitch)
+        {//selectSwitch : 1 for create , 2 for update 
+            if (EmailDoesExists(request, selectSwitch)) throw new ArgumentException($"Email {request.Email} already exists, try another one");
+            if (PhoneDoesExists(request, selectSwitch)) throw new ArgumentException($"Phone {request.Phone} already exists, try another one");
+            if (UsernameDoesExists(request, selectSwitch)) throw new ArgumentException($"Username {request.Username} already exists, try another one");
         }
 
-        private bool UsernameDoesExists(Client request)
+        private bool UsernameDoesExists(Client request, int selectSwitch)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Username == request.Username);
-            return client!=null;
-        }
-        private bool EmailDoesExists(Client request)
-        {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email );
+            var client = selectSwitch switch
+            {
+                1 =>
+                    //create new record
+                    _repositoryContext.Clients.FirstOrDefault(e => e.Username == request.Username),
+                2 =>
+                    //update record
+                    _repositoryContext.Clients.FirstOrDefault(e =>
+                        e.Username == request.Username && e.Id != request.Id),
+                _ => null
+            };
+
             return client != null;
         }
-        private bool PhoneDoesExists(Client request)
+        private bool EmailDoesExists(Client request, int selectSwitch)
         {
-            var client = _repositoryContext.Clients.FirstOrDefault(e => e.Phone==request.Phone);
+            var client = selectSwitch switch
+            {
+                1 =>
+                    //create new record
+                    _repositoryContext.Clients.FirstOrDefault(e => e.Email == request.Email),
+                2 =>
+                    //update record
+                    _repositoryContext.Clients.FirstOrDefault(e =>
+                        e.Email == request.Email && e.Id != request.Id),
+                _ => null
+            };
+
+            return client != null;
+        }
+        private bool PhoneDoesExists(Client request, int selectSwitch)
+        {
+            var client = selectSwitch switch
+            {
+                1 =>
+                    //create new record
+                    _repositoryContext.Clients.FirstOrDefault(e => e.Phone == request.Phone),
+                2 =>
+                    //update record
+                    _repositoryContext.Clients.FirstOrDefault(e =>
+                        e.Phone == request.Phone && e.Id != request.Id),
+                _ => null
+            };
+
             return client != null;
         }
     }

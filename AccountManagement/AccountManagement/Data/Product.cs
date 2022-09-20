@@ -11,7 +11,7 @@ namespace AccountManagement.Data
         public string Name { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
-        
+
 
         [ForeignKey("CategoryId")]
         public int CategoryId { get; set; }
@@ -20,7 +20,7 @@ namespace AccountManagement.Data
         public decimal Price { get; set; }
         public byte[] Image { get; set; }
         public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
+        public DateTime? DateModified { get; set; } = null;
 
 
     }

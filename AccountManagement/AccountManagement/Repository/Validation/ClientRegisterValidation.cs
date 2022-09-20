@@ -28,7 +28,7 @@ namespace AccountManagement.Repository.Validation
             if (!Regex.IsMatch(_clientRegistration.FirstName, "^\\S+$"))
                 _errorList.Add("FirstName not valid(check whitespaces)");
 
-            if (!Regex.IsMatch(_clientRegistration.LastName, "^\\S+$"))
+            if (!Regex.IsMatch(_clientRegistration.LastName, @"^\S+$"))
                 _errorList.Add("LastName not valid(check whitespaces)");
 
             if (!Regex.IsMatch(_clientRegistration.Username,

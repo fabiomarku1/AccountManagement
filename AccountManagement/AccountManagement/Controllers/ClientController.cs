@@ -38,7 +38,7 @@ namespace AccountManagement.Controllers
         }
 
 
-
+        //[Authorize(Roles = "user")]
         [HttpPost("Create")]
         public IActionResult Create(ClientRegistrationDto request)
         {
@@ -69,12 +69,15 @@ namespace AccountManagement.Controllers
 
 
 
-        [HttpGet("GetClient/{id}")] 
+        [HttpGet("GetClient/{id}")]
         public IActionResult GetClient(int id)
         {
             var client = _clientRepository.FindById(id);
-            if (client == null) return NotFound("Client does NOT exist");
-            return Ok(client);
+            if (client == null) return NotFound($"Client with id={id} does NOT exist");
+
+            var mappedClient = _mapper.Map<Client, ClientViewModel>(client);
+
+            return Ok(mappedClient);
         }
 
 
@@ -106,7 +109,7 @@ namespace AccountManagement.Controllers
 
 
             var validation = new ClientRegisterValidation(request);
-            if (!validation.ValidateFields())  return BadRequest(validation.GetErrors());
+            if (!validation.ValidateFields()) return BadRequest(validation.GetErrors());
 
 
             existingClient = _mapper.Map<ClientRegistrationDto, Client>(request, existingClient);
@@ -126,14 +129,8 @@ namespace AccountManagement.Controllers
             {
                 return BadRequest(ex.Message);
             }
-           
 
-        }
 
-        [HttpGet("PrintDetailed")]
-        public IActionResult FindAll()
-        {
-            return Ok(_clientRepository.FindAll());
         }
 
 

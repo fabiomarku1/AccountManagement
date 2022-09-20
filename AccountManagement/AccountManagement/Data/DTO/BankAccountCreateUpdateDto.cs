@@ -9,7 +9,5 @@
         public decimal Balance { get; set; }
 
         public int ClientId { get; set; }
-
-        public bool IsActive { get; set; }
     }
 }

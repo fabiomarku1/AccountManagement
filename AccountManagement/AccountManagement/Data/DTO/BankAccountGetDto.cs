@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace AccountManagement.Data.DTO
 {
     public class BankAccountGetDto
-    { 
+    {
         public int Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }

@@ -16,8 +16,7 @@ namespace AccountManagement.Data
         public DateTime Birthday { get; set; }
         public string Phone { get; set; } //unique
         public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
-
+        public DateTime? DateModified { get; set; } =null;
 
         public string Username { get; set; } //unique
         public byte[] PasswordHash { get; set; } //need to be hashed

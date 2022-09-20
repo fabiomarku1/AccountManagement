@@ -13,7 +13,7 @@ namespace AccountManagement.Data
         [ForeignKey("CurrencyId")]
         public int CurrencyId { get; set; }
         public virtual Currency Currency { get; set; }
-       
+
 
 
         public decimal Balance { get; set; }
@@ -22,10 +22,10 @@ namespace AccountManagement.Data
         public int ClientId { get; set; }
         public virtual Client Client { get; set; }
 
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public DateTime DateCreated { get; set; }
-        public DateTime? DateModified { get; set; }
+        public DateTime? DateModified { get; set; } = null;
 
     }
 }

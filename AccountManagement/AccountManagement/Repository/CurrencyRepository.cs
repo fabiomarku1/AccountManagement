@@ -27,7 +27,7 @@ namespace AccountManagement.Repository
 
         public bool Create(Currency entity)
         {
-            if (DoesExist(entity)) throw new ArgumentException($"Currency with code {entity.Code} already exists");
+            if (DoesExist(entity)) throw new ArgumentException($"Currency with Code={entity.Code} already exists");
 
             entity.DateCreated = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
@@ -37,8 +37,7 @@ namespace AccountManagement.Repository
         }
         public bool Update(Currency entity)
         {
-            if (DoesExistUpdate(entity) ) throw new ArgumentException($"Currency with code {entity.Code} already exists");
-
+            if (DoesExistUpdate(entity)) throw new ArgumentException($"Currency with Code={entity.Code} already exists");
 
             entity.DateModified = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
@@ -58,7 +57,7 @@ namespace AccountManagement.Repository
         }
 
 
-        public bool Save() 
+        public bool Save()
         {
             var numberRowsAffected = _repositoryContext.SaveChanges();
             return numberRowsAffected > 0;
@@ -80,7 +79,7 @@ namespace AccountManagement.Repository
 
         private bool DoesExist(Currency request)
         {
-            var currency= _repositoryContext.Currencies.FirstOrDefault(e => e.Code == request.Code);
+            var currency = _repositoryContext.Currencies.FirstOrDefault(e => e.Code == request.Code);
             return currency != null;
         }
 

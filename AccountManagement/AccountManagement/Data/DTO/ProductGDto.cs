@@ -14,6 +14,6 @@ namespace AccountManagement.Data.DTO
 
         public decimal Price { get; set; }
         public DateTime DateCreated { get; set; }
-        public DateTime DateModified { get; set; }
+        public DateTime? DateModified { get; set; } = null;
     }
 }

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
+using AccountManagement.Data.Model;
 using AccountManagement.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
@@ -39,9 +40,9 @@ namespace AccountManagement.Controllers
 
 
             var client = _clientRepository.FindById(request.ClientId);
-            if (client == null) return Ok("Client does NOT exists");
+            if (client == null) return Ok($"Client with id={request.ClientId} does NOT exists");
             var currency = _currencyRepository.FindById(request.CurrencyId);
-            if (currency == null) return Ok("Currency does NOT exists");
+            if (currency == null) return Ok($"Currency with id={request.CurrencyId} does NOT exists");
 
             bankAccount.Currency = currency;
             bankAccount.Client = client;
@@ -69,7 +70,7 @@ namespace AccountManagement.Controllers
         {
 
             var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound("Bank Account does NOT exists");
+            if (bank == null) return NotFound($"Bank Account with id={id} does NOT exists");
 
             var bans = await _bankAccountRepository.GetBankAccount(id);
             return Ok(bans);
@@ -86,8 +87,8 @@ namespace AccountManagement.Controllers
             var isClientValid = _bankAccountRepository.ClientExists(request.ClientId);
             var isCurrencyValid = _bankAccountRepository.CurrencyExists(request.CurrencyId);
 
-            if (!isClientValid) return Ok("Currency does NOT exists");
-            if (!isCurrencyValid) return Ok("Client does NOT exists");
+            if (!isClientValid) return Ok($"Client with id={request.ClientId} does NOT exists");
+            if (!isCurrencyValid) return Ok($"Currency with id={request.CurrencyId} does NOT exists");
 
             bank = _mapper.Map(request, bank);
 
@@ -105,20 +106,6 @@ namespace AccountManagement.Controllers
                 return Ok(e.Message);
             }
         }
-
-
-        //===============================DELETED IT AT THE END , NO NEED================
-        [HttpDelete("Delete/{id}")]
-        public IActionResult Delete(int id)
-        {
-            var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound("Bank Account does NOT exists");
-
-            var succeed = _bankAccountRepository.Delete(bank);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-        } //===============================DELETED IT AT THE END , NO NEED================
-
-
 
 
         [HttpPut("DeactivateAccount/{id}")]

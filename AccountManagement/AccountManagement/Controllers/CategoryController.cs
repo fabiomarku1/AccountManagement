@@ -54,7 +54,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetCategory(int id)
         {
             var category = _categoryRepository.FindById(id);
-            if (category == null) return NotFound("Category does NOT exist");
+            if (category == null) return NotFound($"Category with id={id} does NOT exist");
             return Ok(category);
         }
 
@@ -79,7 +79,6 @@ namespace AccountManagement.Controllers
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, CategoryDto request)
         {
-
             var category = _categoryRepository.FindById(id);
             if (category == null) return NotFound($"Category with id={id} does NOT exist");
 
@@ -97,13 +96,6 @@ namespace AccountManagement.Controllers
             {
                 return BadRequest(ex.Message);
             }
-        }
-
-        [HttpGet("PrintDetailed")]
-        public IActionResult FindAll()
-        {
-            return Ok(_categoryRepository.FindAll());
-
         }
     }
 }

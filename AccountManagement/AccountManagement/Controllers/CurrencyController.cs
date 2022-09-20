@@ -48,7 +48,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetCurrency(int id)
         {
             var currency = _currencyRepository.FindById(id);
-            if (currency == null) return NotFound("Currency does NOT exist");
+            if (currency == null) return NotFound($"Currency with id={id} does NOT exist");
             return Ok(currency);
         }
 
@@ -65,6 +65,7 @@ namespace AccountManagement.Controllers
         public IActionResult Delete(int id)
         {
             var currency = _currencyRepository.FindById(id);
+            if (currency == null) return NotFound($"Currency with id={id} does NOT exist");
             var succeed = _currencyRepository.Delete(currency);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
@@ -88,15 +89,6 @@ namespace AccountManagement.Controllers
             }
 
         }
-
-
-        //====================================MAY BE DELETED============================
-        [HttpGet("PrintDetailed")]
-        public IActionResult FindAll()
-        {
-            return Ok(_currencyRepository.FindAll());
-        } //====================================MAY BE DELETED============================
-
 
     }
 }
