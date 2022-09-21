@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using AccountManagement.Data.DTO;
+using System.Net;
+using AccountManagement.ErrorHandling;
 
 namespace AccountManagement.Controllers
 {
@@ -49,13 +51,18 @@ namespace AccountManagement.Controllers
             }
 
         }
-
         [HttpGet("GetCategory/{id}")]
         public IActionResult GetCategory(int id)
         {
+
             var category = _categoryRepository.FindById(id);
-            if (category == null) return NotFound($"Category with id={id} does NOT exist");
-            return Ok(category);
+            //   if (category == null) return NotFound($"Category with id={id} does NOT exist");
+            //return Ok(category);
+
+            if (category != null)//User Found
+                return Ok(category);
+            else // Not Found
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Please check category");
         }
 
         [HttpGet("GetCategories")]
@@ -80,22 +87,25 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, CategoryDto request)
         {
             var category = _categoryRepository.FindById(id);
-            if (category == null) return NotFound($"Category with id={id} does NOT exist");
+            //   if (category == null) return NotFound($"Category with id={id} does NOT exist");
 
             category = _mapper.Map(request, category);
-            try
-            {
-                var succeed = _categoryRepository.Update(category);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            var succeed = _categoryRepository.Update(category);
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            //try
+            //{
+            //    var succeed = _categoryRepository.Update(category);
+            //    return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            //}
+            //catch (ArgumentException ex)
+            //{
+            //    return BadRequest(ex.Message);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(ex.Message);
+            //}
         }
     }
 }
