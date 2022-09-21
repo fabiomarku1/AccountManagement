@@ -11,11 +11,13 @@ using System.Threading.Tasks;
 using AccountManagement.Data.DTO;
 using System.Net;
 using AccountManagement.ErrorHandling;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AccountManagement.Controllers
 {
     [Route("api/Category")]
     [ApiController]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
 
@@ -54,15 +56,11 @@ namespace AccountManagement.Controllers
         [HttpGet("GetCategory/{id}")]
         public IActionResult GetCategory(int id)
         {
-
             var category = _categoryRepository.FindById(id);
-            //   if (category == null) return NotFound($"Category with id={id} does NOT exist");
-            //return Ok(category);
 
-            if (category != null)//User Found
-                return Ok(category);
-            else // Not Found
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Please check category");
+            if (category == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Category with id={id} does NOT exist");
+    
+            return Ok(category);
         }
 
         [HttpGet("GetCategories")]
@@ -87,12 +85,13 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, CategoryDto request)
         {
             var category = _categoryRepository.FindById(id);
-            //   if (category == null) return NotFound($"Category with id={id} does NOT exist");
+              if (category == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Category with id={id} does NOT exist");
 
             category = _mapper.Map(request, category);
 
             var succeed = _categoryRepository.Update(category);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
             //try
             //{
             //    var succeed = _categoryRepository.Update(category);

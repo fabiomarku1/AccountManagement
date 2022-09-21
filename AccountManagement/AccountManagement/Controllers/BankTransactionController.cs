@@ -5,6 +5,7 @@ using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Repository.Contracts;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,7 @@ namespace AccountManagement.Controllers
 {
     [Route("api/BankTransaction")]
     [ApiController]
+    [Authorize]
     public class BankTransactionController : ControllerBase
     {
         private readonly IBankTransactionRepository _bankTransactionRepository;

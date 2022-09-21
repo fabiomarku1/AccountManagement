@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace AccountManagement.Controllers
 {
     [Route("api/Statistics")]
-    [ApiController]
-    //  [Authorize]
+    [ApiController] 
+    [Authorize]
     public class DapperStatisticsController : ControllerBase
     {
 

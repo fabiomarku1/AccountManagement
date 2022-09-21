@@ -8,7 +8,9 @@ using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
 using AccountManagement.Repository;
+using AccountManagement.Repository.Contracts;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -24,12 +26,14 @@ namespace AccountManagement.Controllers
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IBankTransactionRepository _bankTransactionRepository;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper, ICategoryRepository categoryRepository)
+        public ProductController(IProductRepository productRepository, IMapper mapper, ICategoryRepository categoryRepository, IBankTransactionRepository bankTransactionRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _categoryRepository = categoryRepository;
+            _bankTransactionRepository = bankTransactionRepository;
         }
 
 
@@ -131,6 +135,30 @@ namespace AccountManagement.Controllers
         {
             var products = await _productRepository.GetProductsAndCategories();
             return Ok(products);
+        }
+
+
+        [HttpPut("CheckoutProducts")]
+        public IActionResult Checkout(List<ProductGDto> listOfProducts)
+        {
+            decimal totalSum = 0;
+
+            //var transaction = new BankTransaction
+            //{
+            //    Action = ActionCall.Terheqje,
+            //    BankAccountId = bankAccount.Id,
+            //    BankAccount = bankAccount
+            //};
+
+            foreach (var i in listOfProducts)
+            {
+                totalSum += i.Price;
+            }
+
+            //var checkout = _bankTransactionRepository.Create(transaction);
+            
+            return Ok(true);
+
         }
 
 

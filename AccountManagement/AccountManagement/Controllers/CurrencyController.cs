@@ -11,11 +11,13 @@ using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
 using AccountManagement.Data.DTO;
 using Mapper = AccountManagement.Mapping.Mapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AccountManagement.Controllers
 {
     [Route("api/currencies")]
     [ApiController]
+    [Authorize]
     public class CurrencyController : ControllerBase
     {
         private readonly ICurrencyRepository _currencyRepository;

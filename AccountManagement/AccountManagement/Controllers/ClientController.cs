@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.ErrorHandling;
 using AccountManagement.Repository;
 using AccountManagement.Repository.Validation;
 using AutoMapper;
@@ -26,6 +28,7 @@ namespace AccountManagement.Controllers
 {
     [Route("api/clients")]
     [ApiController]
+    [Authorize]
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _clientRepository;
@@ -43,28 +46,17 @@ namespace AccountManagement.Controllers
         public IActionResult Create(ClientRegistrationDto request)
         {
             var validation = new ClientRegisterValidation(request);
+  
 
-
-            if (!validation.ValidateFields())
-                return BadRequest(validation.GetErrors());
+            if (!validation.ValidateFields()) return BadRequest(validation.GetErrors());
+            //     throw new HttpStatusCodeException(HttpStatusCode.BadRequest,validation.GetErrors());
 
             var entity = _mapper.Map<Client>(request);
             validation.HashClient(entity);
 
-            try
-            {
-                var succeed = _clientRepository.Create(entity);
+            var succeed = _clientRepository.Create(entity);
 
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
         }
 
 
@@ -73,7 +65,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetClient(int id)
         {
             var client = _clientRepository.FindById(id);
-            if (client == null) return NotFound($"Client with id={id} does NOT exist");
+            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Client with id={id} does not exists");
 
             var mappedClient = _mapper.Map<Client, ClientViewModel>(client);
 
@@ -94,8 +86,8 @@ namespace AccountManagement.Controllers
         {
             var client = _clientRepository.FindById(id);
 
-            if (client == null)
-                return BadRequest($"Client with id={id} does not exist");
+            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
+         
             var succeed = _clientRepository.Delete(client);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
@@ -105,7 +97,8 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, [FromBody] ClientRegistrationDto request)
         {
             var existingClient = _clientRepository.FindById(id);
-            if (existingClient == null) return BadRequest($"Client with id={id} does not exists");
+            if (existingClient == null)  throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
+            //    return BadRequest($"Client with id={id} does not exists");
 
 
             var validation = new ClientRegisterValidation(request);
@@ -114,21 +107,10 @@ namespace AccountManagement.Controllers
 
             existingClient = _mapper.Map<ClientRegistrationDto, Client>(request, existingClient);
             validation.HashClient(existingClient);
-
-            try
-            {
-                var succeed = _clientRepository.Update(existingClient);
-
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            
+            var succeed = _clientRepository.Update(existingClient);
+            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+           
 
 
         }

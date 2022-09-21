@@ -21,11 +21,7 @@ namespace AccountManagement.ErrorHandling.HandlerException
             {
                 await _next(httpContext);
             }
-            //catch ( ex)
-            //{
-            //    await HandleExceptionAsync(httpContext, ex);
-            //}
-            catch (ArgumentException ex)
+            catch (HttpStatusCodeException ex)
             {
                 await HandleExceptionAsync(httpContext, ex);
             }
@@ -35,12 +31,11 @@ namespace AccountManagement.ErrorHandling.HandlerException
                 await HandleExceptionAsync(httpContext, ex);
             }
         }
-        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context, HttpStatusCodeException exception)
         {
+
             context.Response.ContentType = "application/json";
-
-            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-
+            context.Response.StatusCode =(int) exception.StatusCode;
 
             await context.Response.WriteAsync(new ErrorModel()
             {
@@ -48,6 +43,18 @@ namespace AccountManagement.ErrorHandling.HandlerException
                 Message = exception.Message
             }.ToString());
         }
+        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)StatusCodes.Status500InternalServerError;
+
+            await context.Response.WriteAsync(new ErrorModel()
+            {
+                StatusCode = context.Response.StatusCode,
+                Message = exception.Message
+            }.ToString());
+        }
+
 
     }
 }

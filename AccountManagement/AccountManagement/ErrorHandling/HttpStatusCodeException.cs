@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Net;
+﻿using System.Net;
 using System;
 
 namespace AccountManagement.ErrorHandling
@@ -19,17 +18,6 @@ namespace AccountManagement.ErrorHandling
         {
             this.StatusCode = statusCode;
         }
-
-        //public HttpStatusCodeException(HttpStatusCode statusCode, Exception inner)
-        //    : this(statusCode, inner.ToString())
-        //{
-        //}
-
-        //public HttpStatusCodeException(HttpStatusCode statusCode, JObject errorObject)
-        //    : this(statusCode, errorObject.ToString())
-        //{
-        //    this.ContentType = @"application/json";
-        //}
 
     }
 }

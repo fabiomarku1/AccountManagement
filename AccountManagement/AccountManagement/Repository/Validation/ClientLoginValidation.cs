@@ -77,7 +77,8 @@ namespace AccountManagement.Repository.Validation
                 new Claim(ClaimTypes.Sid,client.Id.ToString()),
                 //   new Claim(ClaimTypes.Authentication,client.Id.ToString()),
                 new Claim(ClaimTypes.Email,client.Email),
-                new Claim(ClaimTypes.Name,client.Username)
+                new Claim(ClaimTypes.Name,client.Username),
+              //  new Claim(ClaimTypes.Role,"Admin")
 
             };
 

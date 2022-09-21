@@ -8,6 +8,7 @@ using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
 using AccountManagement.Repository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static Dapper.SqlMapper;
@@ -16,6 +17,7 @@ namespace AccountManagement.Controllers
 {
     [Route("api/BankAccounts")]
     [ApiController]
+    [Authorize]
     public class BankAccountController : ControllerBase
     {
         private readonly IBankAccountRepository _bankAccountRepository;
