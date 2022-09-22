@@ -49,14 +49,16 @@ namespace AccountManagement.Controllers
 
 
             if (!validation.ValidateFields()) return BadRequest(validation.GetErrors());
-            //     throw new HttpStatusCodeException(HttpStatusCode.BadRequest,validation.GetErrors());
 
             var entity = _mapper.Map<Client>(request);
             validation.HashClient(entity);
 
             var succeed = _clientRepository.Create(entity);
 
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Client was created successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error creating the client");
+
+
         }
 
 
@@ -86,19 +88,20 @@ namespace AccountManagement.Controllers
         {
             var client = _clientRepository.FindById(id);
 
-            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
+            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Client with id={id} does not exists");
 
             var succeed = _clientRepository.Delete(client);
 
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Client was deleted successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error deleting the client ");
+
         }
 
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, [FromBody] ClientRegistrationDto request)
         {
             var existingClient = _clientRepository.FindById(id);
-            if (existingClient == null) throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
-            //    return BadRequest($"Client with id={id} does not exists");
+            if (existingClient == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Client with id={id} does not exists");
 
 
             var validation = new ClientRegisterValidation(request);
@@ -109,7 +112,9 @@ namespace AccountManagement.Controllers
             validation.HashClient(existingClient);
 
             var succeed = _clientRepository.Update(existingClient);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Client was updated successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error updating the client ");
 
 
 

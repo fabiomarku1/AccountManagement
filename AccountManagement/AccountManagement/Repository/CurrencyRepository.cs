@@ -5,7 +5,9 @@ using AccountManagement.Data.Model;
 using AutoMapper;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using AccountManagement.ErrorHandling;
 using Dapper;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +29,7 @@ namespace AccountManagement.Repository
 
         public bool Create(Currency entity)
         {
-            if (DoesExist(entity)) throw new ArgumentException($"Currency with Code={entity.Code} already exists");
+            if (DoesExist(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict,$"Currency with Code={entity.Code} already exists");
 
             entity.DateCreated = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
@@ -37,7 +39,7 @@ namespace AccountManagement.Repository
         }
         public bool Update(Currency entity)
         {
-            if (DoesExistUpdate(entity)) throw new ArgumentException($"Currency with Code={entity.Code} already exists");
+            if (DoesExistUpdate(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"Currency with Code={entity.Code} already exists");
 
             entity.DateModified = DateTime.Now;
             entity.Code = entity.Code.ToUpper();

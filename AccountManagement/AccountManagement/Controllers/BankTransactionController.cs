@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
+using AccountManagement.ErrorHandling;
 using AccountManagement.Repository.Contracts;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -37,18 +39,14 @@ namespace AccountManagement.Controllers
             var bankTransaction = _mapper.Map<BankTransaction>(request);
 
             bankTransaction.BankAccount = _bankAccountRepository.FindById(request.BankAccountId);
-            if (bankTransaction.BankAccount == null) return NotFound("Bank account does NOT exists");
+            if (bankTransaction.BankAccount == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Bank Account with id={bankTransaction.BankAccountId} does NOT exists");
 
-            try
-            {
+        
                 var succeed = _bankTransactionRepository.Create(bankTransaction);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
 
-            }
-            catch (ArgumentException e)
-            {
-                return Ok(e.Message);
-            }
+                if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Bank transaction created successfully");
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error creating the transaction");
+
 
         }
 
@@ -57,7 +55,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetTransaction(int id)
         {
             var transaction = _bankTransactionRepository.FindById(id);
-            if (transaction == null) return NotFound("Transaction not found");
+            if (transaction == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Transaction with id={id} does NOT exists");
             var mappedTrans = _mapper.Map<BankTransactionGetDto>(transaction);
             return Ok(mappedTrans);
         }

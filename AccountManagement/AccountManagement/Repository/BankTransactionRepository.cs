@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.ErrorHandling;
 using AccountManagement.Repository.Contracts;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
@@ -90,10 +92,10 @@ namespace AccountManagement.Repository
                 Deposit(request);
             else if (request.Action == ActionCall.Terheqje)
             {
-                if (request.BankAccount.IsActive == false) throw new ArgumentException("The given bank account is not active.\nPlease ACTIVATE it in order to withdrawal");
+                if (request.BankAccount.IsActive == false) throw new HttpStatusCodeException(HttpStatusCode.BadRequest,"The given bank account is not active.\nPlease ACTIVATE it in order to withdrawal");
                 Withdrawal(request);
             }
-            else throw new ArgumentException(" Not valid ACTION , 1-Depostim / 2-Terheqje");
+            else throw new HttpStatusCodeException(HttpStatusCode.Forbidden, " Not valid ACTION , 1-Depostim / 2-Terheqje");
 
         }
 
@@ -112,7 +114,7 @@ namespace AccountManagement.Repository
             if (account.Balance > request.Amount)
                 account.Balance -= request.Amount;
             else
-                throw new ArgumentException("Not enough BALANCE");
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Not enough BALANCE,please refill");
 
         }
 

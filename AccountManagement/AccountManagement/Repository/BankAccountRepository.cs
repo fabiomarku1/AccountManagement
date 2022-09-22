@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.ErrorHandling;
 using Dapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -31,8 +33,7 @@ namespace AccountManagement.Repository
 
         public bool Create(BankAccount entity)
         {
-            if (CodeUserLevelExists(entity)) throw new ArgumentException("There is an existing CODE for this client");
-
+            if (CodeUserLevelExists(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"There is an existing CODE={entity.Code} for this client,try another one");
             entity.DateCreated = DateTime.Now;
             _repositoryContext.BankAccounts.Add(entity);
             return Save();
@@ -49,7 +50,7 @@ namespace AccountManagement.Repository
 
         public bool Update(BankAccount entity)
         {
-            if (CodeUserLevelExists(entity)) throw new ArgumentException("There is an existing CODE for this client");
+            if (CodeUserLevelExists(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"There is an existing CODE={entity.Code} for this client,try another one");
 
             entity.DateModified = DateTime.Now;
             _repositoryContext.BankAccounts.Update(entity);

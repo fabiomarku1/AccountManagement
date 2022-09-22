@@ -38,19 +38,12 @@ namespace AccountManagement.Controllers
             var category = _mapper.Map<Category>(request);
 
 
-            try
-            {
+      
                 var succeed = _categoryRepository.Create(category);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+          
+                if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Category created successfully");
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error creating the category ");
+
 
         }
         [HttpGet("GetCategory/{id}")]
@@ -75,10 +68,13 @@ namespace AccountManagement.Controllers
         public IActionResult Delete(int id)
         {
             var category = _categoryRepository.FindById(id);
-            if (category == null) return NotFound($"Category with id={id} does NOT exist");
+            if (category == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Category with id={id} does NOT exist");
 
             var succeed = _categoryRepository.Delete(category);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Category was deleted successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error deleting the category ");
+
         }
 
         [HttpPut("Update/{id}")]
@@ -90,21 +86,11 @@ namespace AccountManagement.Controllers
             category = _mapper.Map(request, category);
 
             var succeed = _categoryRepository.Update(category);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
 
-            //try
-            //{
-            //    var succeed = _categoryRepository.Update(category);
-            //    return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            //}
-            //catch (ArgumentException ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return BadRequest(ex.Message);
-            //}
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Category was updated successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error updating the category ");
+
+
         }
     }
 }

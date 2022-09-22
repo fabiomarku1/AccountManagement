@@ -49,12 +49,14 @@ namespace AccountManagement.Controllers
             var product = _mapper.Map<Product>(request);
 
             var category = _categoryRepository.FindById(request.CategoryId);
-            if (category == null) return NotFound($"Category with id={request.CategoryId} does NOT exists");
+            if (category == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Category with id={request.CategoryId} does NOT exists");
 
             product.Category = category;
 
             var succeed = _productRepository.Create(product);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Product was created successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error creating the product");
+
         }
 
 
@@ -62,23 +64,25 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, ProductCreateUpdateDto request)
         {
             var product = _productRepository.FindById(id);
-            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+            if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT exist");
 
             var categoryForeign = _categoryRepository.FindById(request.CategoryId);
-            if (categoryForeign == null) return NotFound($"Category with id={request.CategoryId} does NOT exists");
+            if (categoryForeign == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Category with id={request.CategoryId} does NOT exists");
 
 
             product = _mapper.Map(request, product);
 
             var succeed = _productRepository.Update(product);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Product was updated successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error updating the product");
+
         }
 
         [HttpGet("GetProduct/{id}")]
         public IActionResult GetProduct(int id)
         {
             var product = _productRepository.FindById(id);
-            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+            if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT exist");
 
             var mapped = _mapper.Map<ProductGDto>(product);
             return Ok(mapped);
@@ -88,19 +92,19 @@ namespace AccountManagement.Controllers
         public IActionResult InsertImage(int id, [FromForm] ImageDto image)
         {
             var product = _productRepository.FindById(id);
-            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+            if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT exist");
             using (var ms = new MemoryStream())
             {
                 image.Image.CopyTo(ms);
                 var fileBytes = ms.ToArray();
 
-                if ((fileBytes.Length > 5e+6)) return BadRequest("Image size is to large , must be < 5mb ");
+                if ((fileBytes.Length > 5e+6)) throw new HttpStatusCodeException(HttpStatusCode.BadRequest,"Image size is to large , must be < 5mb ");
                 product.Image = fileBytes;
             }
 
             var succeed = _productRepository.Update(product);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Product image was inserted successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error inserting the product image");
         }
 
 
@@ -108,9 +112,9 @@ namespace AccountManagement.Controllers
         public IActionResult GetImage(int id)
         {
             var product = _productRepository.FindById(id);
-            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+            if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT exist");
 
-            if (product.Image == null) return NotFound("Image not found");
+            if (product.Image == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT have an image");
 
             return File(product.Image, "image/png");
 
@@ -121,10 +125,12 @@ namespace AccountManagement.Controllers
         public IActionResult Delete(int id)
         {
             var product = _productRepository.FindById(id);
-            if (product == null) return NotFound($"Product with id={id} does NOT exist");
+            if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={id} does NOT exist");
 
             var succeed = _productRepository.Delete(product);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Product was deleted successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error deleting the product");
+
         }
 
         [HttpGet("GetProducts")]

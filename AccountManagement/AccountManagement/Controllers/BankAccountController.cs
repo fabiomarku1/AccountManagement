@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.ErrorHandling;
 using AccountManagement.Repository;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -41,27 +43,22 @@ namespace AccountManagement.Controllers
 
 
             var client = _clientRepository.FindById(request.ClientId);
-            if (client == null) return Ok($"Client with id={request.ClientId} does NOT exists");
+            if (client==null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Client with id={request.ClientId} does NOT exists");
+            
             var currency = _currencyRepository.FindById(request.CurrencyId);
-            if (currency == null) return Ok($"Currency with id={request.CurrencyId} does NOT exists");
+            if (currency == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Currency with id={request.CurrencyId} does NOT exists");
 
             bankAccount.Currency = currency;
             bankAccount.Client = client;
 
-            try
-            {
+         
                 var succeed = _bankAccountRepository.Create(bankAccount);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+              
+                if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Bank account created successfully");
+           
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error creating the bank account");
 
-            }
-            catch (ArgumentException e)
-            {
-                return Ok(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+
 
 
         }
@@ -71,7 +68,7 @@ namespace AccountManagement.Controllers
         {
 
             var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound($"Bank Account with id={id} does NOT exists");
+            if (bank == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Bank Account with id={id} does NOT exists");
 
             var bans = await _bankAccountRepository.GetBankAccount(id);
             return Ok(bans);
@@ -83,29 +80,22 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, BankAccountCreateUpdateDto request)
         {
             var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound("Bank Account does NOT exists");
+            if (bank == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Bank Account with id={id} does NOT exists");
 
             var isClientValid = _bankAccountRepository.ClientExists(request.ClientId);
             var isCurrencyValid = _bankAccountRepository.CurrencyExists(request.CurrencyId);
 
-            if (!isClientValid) return Ok($"Client with id={request.ClientId} does NOT exists");
-            if (!isCurrencyValid) return Ok($"Currency with id={request.CurrencyId} does NOT exists");
+            if (!isClientValid) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Client with id={request.ClientId} does NOT exists");
+            if (!isCurrencyValid) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Currency with id={request.CurrencyId} does NOT exists");
 
             bank = _mapper.Map(request, bank);
 
-            try
-            {
                 var succeed = _bankAccountRepository.Update(bank);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException e)
-            {
-                return Ok(e.Message);
-            }
-            catch (Exception e)
-            {
-                return Ok(e.Message);
-            }
+
+                if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Bank account updated successfully");
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error updating the bank account");
+
+           
         }
 
 
@@ -113,12 +103,14 @@ namespace AccountManagement.Controllers
         public IActionResult DeactivateAccount(int id)
         {
             var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound("Bank Account does NOT exists");
+            if (bank == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Bank Account with id={id} does NOT exists");
 
-            if (bank.IsActive == false) return Conflict("This bank account is already in PASSIVE status");
+            if (bank.IsActive == false) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"Bank Account with id={id} is already in PASSIVE STATUS");
 
             var succeed = _bankAccountRepository.DeactivateAccount(bank);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Bank account deactivated successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error deactivating the bank account");
         }
 
 
@@ -126,13 +118,17 @@ namespace AccountManagement.Controllers
         public IActionResult ActivateAccount(int id, decimal depositAmount)
         {
             var bank = _bankAccountRepository.FindById(id);
-            if (bank == null) return NotFound("Bank Account does NOT exists");
+            if (bank == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Bank Account with id={id} does NOT exists");
 
-            if (bank.IsActive == true) return Conflict("This bank account is already in ACTIVE status");
+            if (bank.IsActive == true) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"Bank Account with id={id} is already in ACTIVE STATUS");
 
             var succeed = _bankAccountRepository.ActivateAccount(bank, depositAmount);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Bank account activated successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "There was an error activating the bank account");
+
         }
+
 
         [HttpGet("GetBankAccounts")]
         public async Task<IActionResult> GetBankAccounts()

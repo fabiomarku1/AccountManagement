@@ -6,7 +6,9 @@ using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using AccountManagement.ErrorHandling;
 
 namespace AccountManagement.Repository
 {
@@ -24,7 +26,7 @@ namespace AccountManagement.Repository
 
         public bool Create(Category entity)
         {
-            if (DoesExist(entity)) throw new ArgumentException($"Category with code {entity.Code} already exists");
+            if (DoesExist(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict,$"Category with CODE={entity.Code} already exists");
 
             entity.DateCreated = DateTime.Now;
             entity.Code = entity.Code.ToUpper();
@@ -46,7 +48,7 @@ namespace AccountManagement.Repository
 
         public bool Update(Category entity)
         {
-            if (DoesExistUpdate(entity)) throw new ArgumentException($"Category with code {entity.Code} already exists");
+            if (DoesExistUpdate(entity)) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"Category with CODE={entity.Code} already exists");
 
             entity.DateModified = DateTime.Now;
             entity.Code = entity.Code.ToUpper();

@@ -12,6 +12,8 @@ using System.Threading.Tasks;
 using AccountManagement.Data.DTO;
 using Mapper = AccountManagement.Mapping.Mapper;
 using Microsoft.AspNetCore.Authorization;
+using AccountManagement.ErrorHandling;
+using System.Net;
 
 namespace AccountManagement.Controllers
 {
@@ -33,24 +35,19 @@ namespace AccountManagement.Controllers
         public IActionResult Create(CurrencyDto request)
         {
             var currency = _mapper.Map<Currency>(request);
+            var succeed = _currencyRepository.Create(currency);
 
-            try
-            {
-                var succeed = _currencyRepository.Create(currency);
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Currency was created successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error creating the currency");
 
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
         }
 
         [HttpGet("GetCurrency/{id}")]
         public IActionResult GetCurrency(int id)
         {
             var currency = _currencyRepository.FindById(id);
-            if (currency == null) return NotFound($"Currency with id={id} does NOT exist");
+            if (currency == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Currency with id={id} does NOT exist");
             return Ok(currency);
         }
 
@@ -67,28 +64,25 @@ namespace AccountManagement.Controllers
         public IActionResult Delete(int id)
         {
             var currency = _currencyRepository.FindById(id);
-            if (currency == null) return NotFound($"Currency with id={id} does NOT exist");
+            if (currency == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Currency with id={id} does NOT exist");
             var succeed = _currencyRepository.Delete(currency);
-            return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
+            if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Currency was deleted successfully");
+            throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error deleting the currency");
+
         }
 
         [HttpPut("Update/{id}")]
         public IActionResult Update(int id, CurrencyDto request)
         {
             var existingCurrency = _currencyRepository.FindById(id);
-            if (existingCurrency == null) return NotFound($"Currency with id={id} does NOT exist ");
+            if (existingCurrency == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Currency with id={id} does NOT exist");
 
             existingCurrency = _mapper.Map(request, existingCurrency);
 
-            try
-            {
+   
                 var succeed = _currencyRepository.Update(existingCurrency);
-                return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                if (succeed) throw new HttpStatusCodeException(HttpStatusCode.OK, "Currency was updated successfully");
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "There was an error updating the currency");
 
         }
 

@@ -107,15 +107,6 @@ namespace AccountManagement.Repository
             if (UsernameDoesExists(request, selectSwitch)) throw new HttpStatusCodeException(HttpStatusCode.Conflict, $"Username '{request.Username}' already exists, try another one");
         }
 
-        /*
-        private void DoesExists(Client request, int selectSwitch)
-        {//selectSwitch : 1 for create , 2 for update 
-            if (EmailDoesExists(request, selectSwitch)) throw new ArgumentException($"Email {request.Email} already exists, try another one");
-            if (PhoneDoesExists(request, selectSwitch)) throw new ArgumentException($"Phone {request.Phone} already exists, try another one");
-            if (UsernameDoesExists(request, selectSwitch)) throw new ArgumentException($"Username {request.Username} already exists, try another one");
-        }
-        */
-
 
         private bool UsernameDoesExists(Client request, int selectSwitch)
         {
