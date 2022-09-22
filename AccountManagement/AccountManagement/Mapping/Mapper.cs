@@ -36,6 +36,7 @@ namespace AccountManagement.Mapping
             CreateMap<BankTransaction, BankTransactionCreateDto>().ReverseMap();
             CreateMap<BankTransaction, BankTransactionGetDto>().ReverseMap();
 
+            CreateMap<Product, ProductCheckoutDTO>().ReverseMap();
 
 
             //CreateMap<Client, ClientDto>().ReverseMap();

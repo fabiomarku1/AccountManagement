@@ -41,7 +41,7 @@ namespace AccountManagement
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AccountManagement", Version = "v1" });
-                
+
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "Standard Authorization header using Barer",
@@ -78,8 +78,8 @@ namespace AccountManagement
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                         Configuration.GetSection("AppSettings:Token").Value)),
-                    ValidateIssuer  = false,
-                    ValidateAudience  = false
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 };
             });
         }
@@ -92,15 +92,14 @@ namespace AccountManagement
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AccountManagement v1"));
-               
-            }
 
-             app.ConfigureCustomExceptionMiddleware();
+            }
+            app.ConfigureCustomExceptionMiddleware();
 
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
-            
+
             app.UseRouting();
 
             app.UseAuthorization();

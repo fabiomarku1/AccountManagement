@@ -25,7 +25,6 @@ namespace AccountManagement.Controllers
         private readonly ICurrencyRepository _currencyRepository;
         private readonly IClientRepository _clientRepository;
 
-
         public BankAccountController(IMapper mapper, IBankAccountRepository bankAccountRepository, IClientRepository clientRepository, ICurrencyRepository currencyRepository)
         {
             _mapper = mapper;

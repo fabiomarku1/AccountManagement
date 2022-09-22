@@ -28,7 +28,7 @@ namespace AccountManagement.Controllers
 {
     [Route("api/clients")]
     [ApiController]
-    [Authorize]
+    // [Authorize]
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _clientRepository;
@@ -46,7 +46,7 @@ namespace AccountManagement.Controllers
         public IActionResult Create(ClientRegistrationDto request)
         {
             var validation = new ClientRegisterValidation(request);
-  
+
 
             if (!validation.ValidateFields()) return BadRequest(validation.GetErrors());
             //     throw new HttpStatusCodeException(HttpStatusCode.BadRequest,validation.GetErrors());
@@ -65,7 +65,7 @@ namespace AccountManagement.Controllers
         public IActionResult GetClient(int id)
         {
             var client = _clientRepository.FindById(id);
-            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound,$"Client with id={id} does not exists");
+            if (client == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Client with id={id} does not exists");
 
             var mappedClient = _mapper.Map<Client, ClientViewModel>(client);
 
@@ -87,7 +87,7 @@ namespace AccountManagement.Controllers
             var client = _clientRepository.FindById(id);
 
             if (client == null) throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
-         
+
             var succeed = _clientRepository.Delete(client);
 
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
@@ -97,7 +97,7 @@ namespace AccountManagement.Controllers
         public IActionResult Update(int id, [FromBody] ClientRegistrationDto request)
         {
             var existingClient = _clientRepository.FindById(id);
-            if (existingClient == null)  throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
+            if (existingClient == null) throw new HttpStatusCodeException(HttpStatusCode.BadRequest, $"Client with id={id} does not exists");
             //    return BadRequest($"Client with id={id} does not exists");
 
 
@@ -107,10 +107,10 @@ namespace AccountManagement.Controllers
 
             existingClient = _mapper.Map<ClientRegistrationDto, Client>(request, existingClient);
             validation.HashClient(existingClient);
-            
+
             var succeed = _clientRepository.Update(existingClient);
             return succeed ? Ok(new { Result = true }) : Ok(new { Result = false });
-           
+
 
 
         }

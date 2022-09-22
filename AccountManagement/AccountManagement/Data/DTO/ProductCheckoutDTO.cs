@@ -1,7 +1,17 @@
-﻿namespace AccountManagement.Data.DTO
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace AccountManagement.Data.DTO
 {
     public class ProductCheckoutDTO
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public int Quantity { get; set; } = 1;
+
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+
 
     }
 }

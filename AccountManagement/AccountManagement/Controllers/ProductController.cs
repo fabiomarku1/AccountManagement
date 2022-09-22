@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.ErrorHandling;
 using AccountManagement.Repository;
 using AccountManagement.Repository.Contracts;
 using AutoMapper;
@@ -27,13 +29,15 @@ namespace AccountManagement.Controllers
         private readonly IMapper _mapper;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IBankTransactionRepository _bankTransactionRepository;
+        private readonly IBankAccountRepository _bankAccountRepository;
 
-        public ProductController(IProductRepository productRepository, IMapper mapper, ICategoryRepository categoryRepository, IBankTransactionRepository bankTransactionRepository)
+        public ProductController(IProductRepository productRepository, IMapper mapper, ICategoryRepository categoryRepository, IBankTransactionRepository bankTransactionRepository, IBankAccountRepository bankAccountRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
             _categoryRepository = categoryRepository;
             _bankTransactionRepository = bankTransactionRepository;
+            _bankAccountRepository = bankAccountRepository;
         }
 
 
@@ -60,7 +64,7 @@ namespace AccountManagement.Controllers
             var product = _productRepository.FindById(id);
             if (product == null) return NotFound($"Product with id={id} does NOT exist");
 
-            var categoryForeign=_categoryRepository.FindById(request.CategoryId);
+            var categoryForeign = _categoryRepository.FindById(request.CategoryId);
             if (categoryForeign == null) return NotFound($"Category with id={request.CategoryId} does NOT exists");
 
 
@@ -137,30 +141,9 @@ namespace AccountManagement.Controllers
             return Ok(products);
         }
 
-
-        [HttpPut("CheckoutProducts")]
-        public IActionResult Checkout(List<ProductGDto> listOfProducts)
-        {
-            decimal totalSum = 0;
-
-            //var transaction = new BankTransaction
-            //{
-            //    Action = ActionCall.Terheqje,
-            //    BankAccountId = bankAccount.Id,
-            //    BankAccount = bankAccount
-            //};
-
-            foreach (var i in listOfProducts)
-            {
-                totalSum += i.Price;
-            }
-
-            //var checkout = _bankTransactionRepository.Create(transaction);
-            
-            return Ok(true);
-
-        }
-
+        /*
+       
+        */
 
 
     }
