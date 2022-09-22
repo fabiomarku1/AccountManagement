@@ -5,11 +5,12 @@ using AccountManagement.Contracts;
 using AccountManagement.Data;
 using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
+using AccountManagement.Repository.Contracts;
 using Dapper;
 
 namespace AccountManagement.Repository
 {
-    public class CheckoutRepository : IRepositoryBase<Sales>
+    public class CheckoutRepository :ICheckoutRepository
     {
 
 

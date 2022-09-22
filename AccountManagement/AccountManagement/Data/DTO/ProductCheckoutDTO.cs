@@ -9,9 +9,5 @@ namespace AccountManagement.Data.DTO
         public decimal Price { get; set; }
         public int Quantity { get; set; } = 1;
 
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
-
-
     }
 }

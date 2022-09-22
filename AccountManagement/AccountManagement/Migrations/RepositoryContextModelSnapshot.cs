@@ -184,6 +184,32 @@ namespace AccountManagement.Migrations
                     b.ToTable("Currencies");
                 });
 
+            modelBuilder.Entity("AccountManagement.Data.DTO.ProductCheckoutDTO", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SalesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SalesId");
+
+                    b.ToTable("ProductCheckoutDTO");
+                });
+
             modelBuilder.Entity("AccountManagement.Data.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -235,14 +261,12 @@ namespace AccountManagement.Migrations
                     b.Property<int>("BankAccountId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BankAccountId");
-
-                    b.HasIndex("ProductId");
 
                     b.ToTable("Sales");
                 });
@@ -277,6 +301,13 @@ namespace AccountManagement.Migrations
                     b.Navigation("BankAccount");
                 });
 
+            modelBuilder.Entity("AccountManagement.Data.DTO.ProductCheckoutDTO", b =>
+                {
+                    b.HasOne("AccountManagement.Data.Sales", null)
+                        .WithMany("ListOfProducts")
+                        .HasForeignKey("SalesId");
+                });
+
             modelBuilder.Entity("AccountManagement.Data.Product", b =>
                 {
                     b.HasOne("AccountManagement.Data.Category", "Category")
@@ -296,15 +327,12 @@ namespace AccountManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AccountManagement.Data.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("BankAccount");
+                });
 
-                    b.Navigation("Product");
+            modelBuilder.Entity("AccountManagement.Data.Sales", b =>
+                {
+                    b.Navigation("ListOfProducts");
                 });
 #pragma warning restore 612, 618
         }

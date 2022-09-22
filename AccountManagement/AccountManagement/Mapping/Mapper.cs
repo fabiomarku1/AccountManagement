@@ -38,6 +38,8 @@ namespace AccountManagement.Mapping
 
             CreateMap<Product, ProductCheckoutDTO>().ReverseMap();
 
+            CreateMap<Sales, SalesDTO>().ReverseMap();
+
 
             //CreateMap<Client, ClientDto>().ReverseMap();
         }

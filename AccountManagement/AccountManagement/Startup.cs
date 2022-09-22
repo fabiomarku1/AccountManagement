@@ -67,6 +67,8 @@ namespace AccountManagement
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IBankAccountRepository, BankAccountRepository>();
             services.AddScoped<IBankTransactionRepository, BankTransactionRepository>();
+            services.AddScoped<ICheckoutRepository, CheckoutRepository>();
+
             services.AddAutoMapper(typeof(Mapper));
 
 
