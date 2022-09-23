@@ -7,10 +7,11 @@ using AccountManagement.Data.DTO;
 using AccountManagement.Data.Model;
 using AccountManagement.Repository.Contracts;
 using Dapper;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AccountManagement.Repository
 {
-    public class CheckoutRepository :ICheckoutRepository
+    public class CheckoutRepository : ICheckoutRepository
     {
 
 
@@ -31,10 +32,16 @@ namespace AccountManagement.Repository
             return Save();
         }
 
-        public async Task<IEnumerable<Sales>> GetTransactions()
+        public async Task<IEnumerable<SalesDTO>> GetTransactions()
         {
             using var connection = _dataBase.CreateConnection();
-            var sales = await connection.QueryAsync<Sales>("select * from BankTransactions");
+            var sales = await connection.QueryAsync<SalesDTO>("select * from Sales");
+            //  InsertProducts(sales);
+            foreach (var i in sales)
+            {
+                var list = await connection.QueryAsync<ProductCheckoutDTO>($"select * from ProductCheckoutDTO p where SalesId in (select Id from Sales where Id={i.Id})");
+                i.ListOfProducts = list.ToList();
+            }
             return sales.ToList();
         }
 

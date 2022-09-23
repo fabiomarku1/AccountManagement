@@ -24,7 +24,7 @@ namespace AccountManagement.Controllers
 
 
         [HttpPost("Login")]
-        public ActionResult<string> Login(ClientLogin input)
+        public ActionResult<string> Login([FromBody]ClientLogin input)
         {
             var validation = new ClientLoginValidation(input);
 

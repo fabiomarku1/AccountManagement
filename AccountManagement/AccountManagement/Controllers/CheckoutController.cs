@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace AccountManagement.Controllers
 {
@@ -20,126 +21,138 @@ namespace AccountManagement.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-        private readonly ICategoryRepository _categoryRepository;
         private readonly IBankAccountRepository _bankAccountRepository;
         private readonly IBankTransactionRepository _bankTransactionRepository;
         private readonly ICheckoutRepository _checkoutRepository;
 
-        private static List<ProductCheckoutDTO> list;
-        private static decimal totalSummation;
 
-        public CheckoutController(IProductRepository productRepository, IMapper mapper, ICategoryRepository categoryRepository, IBankAccountRepository bankAccountRepository, IBankTransactionRepository bankTransactionRepository, ICheckoutRepository checkoutRepository)
+        private static readonly Dictionary<int, ProductCheckoutDTO> ProductDictionary =
+            new Dictionary<int, ProductCheckoutDTO>();
+
+        private static List<ProductCheckoutDTO> ListOfProductsDto = new List<ProductCheckoutDTO>();
+        private static decimal _totalSummation;
+
+        public CheckoutController(IProductRepository productRepository, IMapper mapper,
+            IBankAccountRepository bankAccountRepository, IBankTransactionRepository bankTransactionRepository,
+            ICheckoutRepository checkoutRepository)
         {
             _productRepository = productRepository;
             _mapper = mapper;
-            _categoryRepository = categoryRepository;
             _bankAccountRepository = bankAccountRepository;
             _bankTransactionRepository = bankTransactionRepository;
             _checkoutRepository = checkoutRepository;
         }
 
-
-        [HttpPut("Chart")]
-        public IActionResult Chart(List<int> idOfProducts)
+        [HttpPut("AddItemToChart/{id}")]
+        public IActionResult AddItemToChart(int id)
         {
-            Dictionary<int, ProductCheckoutDTO> productDictionary = new Dictionary<int, ProductCheckoutDTO>();
+            var product = _productRepository.FindById(id);
+            if (product == null)
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound,
+                    $"Error trying to fetch the product with id={id}");
 
-            List<ProductCheckoutDTO> listOfProd = new List<ProductCheckoutDTO>();
+            var productMapped = _mapper.Map<Product, ProductCheckoutDTO>(product);
 
-
-
-
-            int counter = 0;
-
-            foreach (var i in idOfProducts)
+            if (!ProductDictionary.ContainsKey(id))
             {
-                var product = _productRepository.FindById(i);
-                if (product == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Product with id={i} does NOT exist");
-
-
-                var mapped = _mapper.Map<Product, ProductCheckoutDTO>(product);
-
-                if (!productDictionary.ContainsKey(i))
-                {
-                    productDictionary.Add(i, mapped);
-                }
-                else
-                {
-                    productDictionary[i].Quantity++;
-                }
+                ProductDictionary.Add(id, productMapped);
+                throw new HttpStatusCodeException(HttpStatusCode.OK,
+                    $"Product with id={id} added successfully to the chart");
             }
-
-            decimal totalSum = productDictionary.Sum(i => i.Value.Quantity * i.Value.Price);
-
-
-            foreach (var i in productDictionary)
+            else
             {
-                listOfProd.Add(i.Value);
+                ProductDictionary.Remove(id);
+                throw new HttpStatusCodeException(HttpStatusCode.OK, $"Product with id={id} removed from the chart ");
             }
-
-            list=listOfProd;
-            totalSummation=totalSum;
-
-            return Ok(totalSum);
 
         }
 
+        [HttpPut("UpdateQuantityForProduct/{id}")]
+        public IActionResult UpdateQuantity(int id, int quantityRequest)
+        {
+            if (!ProductDictionary.ContainsKey(id))
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound,
+                    $"Product with id={id} does NOT exists in the chart");
 
-        [HttpPut("SelectBankAccount/{bankAccountId}")]
+            if (quantityRequest == 0) //just increment quantity by one
+            {
+                ProductDictionary[id].Quantity++;
+            }
+            else ProductDictionary[id].Quantity = quantityRequest;
+
+            throw new HttpStatusCodeException(HttpStatusCode.OK, "Product quantity updated successfully");
+        }
+
+
+
+        //List<int> idOfProducts
+        [HttpGet("Chart")]
+        public IActionResult Chart()
+        {
+            decimal totalSum = ProductDictionary.Sum(i => i.Value.Quantity * i.Value.Price);
+
+            ListOfProductsDto = ProductDictionary.Values.ToList();
+            _totalSummation = totalSum;
+
+            return Ok(ListOfProductsDto);
+        }
+
+
+        [HttpPost("SelectBankAccount/{bankAccountId}")]
         public IActionResult SelectBank(int bankAccountId)
         {
+            if (_totalSummation == 0)
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Please REDIRECT to Chart first.");
+
             var bankAccount = _bankAccountRepository.FindById(bankAccountId);
             if (bankAccount == null)
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound,
-                    $"Bank account with id={bankAccount} does not exists");
+                throw new HttpStatusCodeException(HttpStatusCode.NotFound, $"Bank account with id={bankAccount.Id} does not exists");
 
-            //var transaction=_bankTransactionRepository.Create(new BankTransaction()
-            //{
-            //    Action = ActionCall.Terheqje,
-            //    Amount = totalSummation,
+            if (bankAccount.Balance < _totalSummation && bankAccount.IsActive == true)
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest,
+                    $"Bank account with id={bankAccount.Id} does not have sufficient balance,please refill");
 
-            //})
+            if (bankAccount.IsActive == true)
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest,
+                    $"Bank account with id={bankAccount.Id} is in PASSIVE STATUS , please activate it in order to proceed");
+
 
             var sales = new Sales()
             {
-                Amount = totalSummation,
+                Amount = _totalSummation,
                 BankAccount = bankAccount,
-               // BankAccountId = bankAccount.Id,
-                ListOfProducts = list,
+                BankAccountId = bankAccount.Id,
+                ListOfProducts = ListOfProductsDto,
                 DateCreated = DateTime.Now,
             };
 
-
             _checkoutRepository.Create(sales);
 
-            var mappedSale = _mapper.Map<Sales, SalesDTO>(sales);
-            mappedSale.ListOfProduct = list;
-
-            return Ok(mappedSale);
-
-            list = null;
-            totalSummation=0;
-
-        }
-
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        private IActionResult DoCheckout(decimal sum, BankAccount bankAccount)
-        {
-
-            var trans = new BankTransaction()
+            _bankTransactionRepository.Create(new BankTransaction()
             {
+                Action = ActionCall.Terheqje,
+                Amount = _totalSummation,
                 BankAccount = bankAccount,
                 BankAccountId = bankAccount.Id,
-                Action = ActionCall.Terheqje,
-                Amount = sum,
+                DateCreated = DateTime.Now,
+            });
 
-            };
+            var mappedSale = _mapper.Map<Sales, SalesDTO>(sales);
 
-            var result = _bankTransactionRepository.Create(trans);
+            ListOfProductsDto.Clear();
+            ProductDictionary.Clear();
+            _totalSummation = 0;
 
-            return Ok(result);
+            throw new HttpStatusCodeException(HttpStatusCode.OK, "Purchase was made successfully");
+
         }
 
+        [HttpGet("GetSales")]
+        public async Task<IActionResult> GetSales()
+        {
+            var data = await _checkoutRepository.GetTransactions();
+            return Ok(data);
+        }
     }
+
 }

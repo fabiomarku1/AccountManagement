@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AccountManagement.Controllers
 {
     [Route("api/Statistics")]
-    [ApiController] 
+    [ApiController]
     [Authorize]
     public class DapperStatisticsController : ControllerBase
     {
@@ -31,7 +31,7 @@ namespace AccountManagement.Controllers
 
 
         [HttpGet("GetClientAccountData")]
-        public IActionResult GetFirstAPI()
+        public IActionResult GetClientAccountData()
         {
             var connection = _dapperDb.CreateConnection();
 
@@ -40,6 +40,7 @@ namespace AccountManagement.Controllers
                                         "where c.Id=b.ClientId AND cu.Id=b.CurrencyId");
             return Ok(data);
         }
+
 
 
 

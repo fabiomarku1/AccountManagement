@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AccountManagement.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20220922185323_FirstMig")]
-    partial class FirstMig
+    [Migration("20220923084545_addedsales")]
+    partial class addedsales
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
