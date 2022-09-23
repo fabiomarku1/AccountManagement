@@ -12,11 +12,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AccountManagement.Controllers
 {
     [Route("api/Checkout")]
     [ApiController]
+    [Authorize]
     public class CheckoutController : ControllerBase
     {
         private readonly IProductRepository _productRepository;

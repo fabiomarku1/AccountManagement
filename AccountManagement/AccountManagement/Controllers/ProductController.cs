@@ -23,6 +23,7 @@ namespace AccountManagement.Controllers
 {
     [Route("api/Products")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IProductRepository _productRepository;
